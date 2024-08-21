@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Moto. Etc.
+subtitle: Research Associate in Imperial College London, Jelfs Group: <a href='#'>[Affiliations](https://www.jelfs-group.org/)</a>
 
 profile:
   align: right
@@ -15,5 +15,5 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-I am a computational chemist working on... _pages about.md
+I am a computational chemist working on...
 
