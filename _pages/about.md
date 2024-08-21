@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: Research Associate in Imperial College London, Jelfs Group: <a href='#'>[Affiliations](https://www.jelfs-group.org/)</a>
+subtitle: Research Associate in Imperial College London, Jelfs Group: <a href='#'>[Affiliations]</a>
 
 profile:
   align: right
