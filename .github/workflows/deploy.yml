@@ -1,23 +1,19 @@
-jobs:
-  build_and_deploy:
-    name: Build and Deploy
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      # ... steps continue here```
-*   `name: github-pages`: This is the required name for the environment.
-*   `url: ...`: This is a best practice. It tells GitHub to display the final URL of your website directly on the "Actions" page after a successful deployment.
+# ==================================================================================
+# THE ULTIMATE DEPLOYMENT WORKFLOW FOR A ZOLA SITE ON GITHUB PAGES
+# ==================================================================================
+# This workflow is triggered on any push to the 'main' branch.
+# It uses the official GitHub Actions for Pages to build and deploy your site.
+#
+# WHAT IT DOES:
+# 1. Checks out your source code.
+# 2. Installs the latest version of Zola using a fast, trusted community action.
+# 3. Builds your Zola site, critically overriding the base URL to your live
+#    production URL. This ensures all links and asset paths are correct.
+# 4. Packages the built site (the 'public' folder) into an artifact.
+# 5. Deploys that artifact to GitHub Pages.
+# ==================================================================================
 
----
-
-### The Full, Final, and Correct `deploy.yml` File
-
-This is it. For absolute clarity, copy and paste this entire block to replace the contents of your `deploy.yml` file. This version includes all the previous fixes and this final one.
-
-```yaml
-name: Build and Deploy Website
+name: Build and Deploy Zola Website
 
 on:
   # Run this workflow automatically on any push to the "main" branch
@@ -26,7 +22,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab on GitHub
   workflow_dispatch:
 
-# Grant the necessary permissions for the workflow to deploy
+# Grant the necessary permissions for the workflow to deploy.
+# 'contents: read' is for checking out the code.
+# 'pages: write' and 'id-token: write' are required for deploying to GitHub Pages.
 permissions:
   contents: read
   pages: write
@@ -36,32 +34,40 @@ jobs:
   build_and_deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    
+    # Specify the deployment environment. This is a required security feature.
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }} # This will display the live URL after a successful run
+
     steps:
-      - name: Checkout your repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install Zola
-        # This uses a community action to install the latest version of Zola
+        # Use a fast and reliable community action to install the latest Zola version.
         uses: taiki-e/install-action@zola
 
-      # The GitHub Action for Pages handles the rest
-      - name: Setup Pages
+      - name: Setup GitHub Pages
+        # Use the official action to configure the Pages deployment environment.
         uses: actions/configure-pages@v4
 
-      - name: Build with Zola
-        # Tell Zola to build the site into the default `public` directory
-        run: zola build
+      - name: Build Website with Zola
+        # THIS IS THE MOST CRITICAL STEP.
+        # It runs the `zola build` command and uses the `--base-url` flag to override
+        # any URL in your local config.toml. This guarantees all links, CSS,
+        # and JS paths are generated correctly for your live GitHub Pages site.
+        run: zola build --base-url https://gokay-avci.github.io/gokay-avci.github.io/
 
-      - name: Upload artifact
-        # This action packages the website files for deployment
+      - name: Upload Artifact
+        # This action packages the finished website (from the '/public' directory)
+        # and prepares it for deployment.
         uses: actions/upload-pages-artifact@v3
         with:
-          # Tell the action to upload the 'public' directory
+          # Tell the action that our built website is in the 'public' directory.
           path: './public'
 
       - name: Deploy to GitHub Pages
         id: deployment
+        # This is the final step that takes the packaged artifact and publishes it.
         uses: actions/deploy-pages@v4
