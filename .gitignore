@@ -1,0 +1,15 @@
+# Zola build output
+/public/
+
+# Wasm / Rust build artifacts
+/demos/*/target/
+/demos/*/pkg/
+*.wasm
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor and temporary files
+*.save
