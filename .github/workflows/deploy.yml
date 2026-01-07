@@ -34,8 +34,11 @@ jobs:
         run: zola build
 
       - name: Upload artifact
-        # Automatically uploads the `public` folder for deployment
+        # This action packages the website files for deployment
         uses: actions/upload-pages-artifact@v3
+        with:
+          # THIS IS THE FIX: Tell the action to upload the 'public' directory
+          path: './public'
 
       - name: Deploy to GitHub Pages
         id: deployment
