@@ -1,30 +1,17 @@
 # ==================================================================================
-# THE ULTIMATE DEPLOYMENT WORKFLOW FOR A ZOLA SITE ON GITHUB PAGES
+# THE ULTIMATE DEPLOYMENT WORKFLOW (WITH RUST/WASM SUPPORT)
 # ==================================================================================
-# This workflow is triggered on any push to the 'main' branch.
-# It uses the official GitHub Actions for Pages to build and deploy your site.
-#
-# WHAT IT DOES:
-# 1. Checks out your source code.
-# 2. Installs the latest version of Zola using a fast, trusted community action.
-# 3. Builds your Zola site, critically overriding the base URL to your live
-#    production URL. This ensures all links and asset paths are correct.
-# 4. Packages the built site (the 'public' folder) into an artifact.
-# 5. Deploys that artifact to GitHub Pages.
+# This workflow builds and deploys a Zola site that includes interactive
+# demos compiled from Rust to WebAssembly using Trunk.
 # ==================================================================================
 
-name: Build and Deploy Zola Website
+name: Build and Deploy Zola Website with WASM
 
 on:
-  # Run this workflow automatically on any push to the "main" branch
   push:
     branches: [ "main" ]
-  # Allows you to run this workflow manually from the Actions tab on GitHub
   workflow_dispatch:
 
-# Grant the necessary permissions for the workflow to deploy.
-# 'contents: read' is for checking out the code.
-# 'pages: write' and 'id-token: write' are required for deploying to GitHub Pages.
 permissions:
   contents: read
   pages: write
@@ -34,40 +21,65 @@ jobs:
   build_and_deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    
-    # Specify the deployment environment. This is a required security feature.
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # This will display the live URL after a successful run
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # ------------------------------------------------------------------
+      # STAGE 1: BUILD THE WASM DEMOS
+      # ------------------------------------------------------------------
+
+      - name: Install Rust Toolchain
+        # Sets up the entire Rust compiler environment (rustc, cargo).
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo Dependencies
+        # This is a critical optimization. It saves the downloaded Rust
+        # libraries (crates) between runs. The first build will be slow,
+        # but subsequent builds will be much faster.
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install Trunk
+        # Installs the `trunk` tool, which is the best way to build
+        # WASM apps that need to interact with the web.
+        run: cargo install --locked trunk
+
+      - name: Build WASM Demos with Trunk
+        # This step runs the `trunk build` command inside each demo folder.
+        # It will read the `Trunk.toml` file in each and place the
+        # compiled output into your `static/demos/` directory.
+        run: |
+          for D in demos/*; do
+            if [ -d "$D" ]; then
+              echo "Building WASM Demo in $D..."
+              trunk build --release "$D"
+            fi
+          done
+
+      # ------------------------------------------------------------------
+      # STAGE 2: BUILD THE ZOLA WEBSITE
+      # ------------------------------------------------------------------
+
       - name: Install Zola
-        # Use a fast and reliable community action to install the latest Zola version.
         uses: taiki-e/install-action@zola
 
       - name: Setup GitHub Pages
-        # Use the official action to configure the Pages deployment environment.
         uses: actions/configure-pages@v4
 
       - name: Build Website with Zola
-        # THIS IS THE MOST CRITICAL STEP.
-        # It runs the `zola build` command and uses the `--base-url` flag to override
-        # any URL in your local config.toml. This guarantees all links, CSS,
-        # and JS paths are generated correctly for your live GitHub Pages site.
-        run: zola build --base-url https://gokay-avci.github.io
+        # Now that the demos are built and sitting in the /static folder,
+        # Zola will automatically package them with the rest of the site.
+        run: zola build --base-url https://gokay-avci.github.io/
 
       - name: Upload Artifact
-        # This action packages the finished website (from the '/public' directory)
-        # and prepares it for deployment.
         uses: actions/upload-pages-artifact@v3
         with:
-          # Tell the action that our built website is in the 'public' directory.
           path: './public'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        # This is the final step that takes the packaged artifact and publishes it.
         uses: actions/deploy-pages@v4
