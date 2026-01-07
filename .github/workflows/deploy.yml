@@ -1,0 +1,42 @@
+name: Build and Deploy Website
+
+on:
+  # Run this workflow automatically on any push to the "main" branch
+  push:
+    branches: [ "main" ]
+  # Allows you to run this workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+
+# Grant the necessary permissions for the workflow to deploy
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository
+        uses: actions/checkout@v4
+
+      - name: Install Zola
+        # This uses a community action to install the latest version of Zola
+        uses: taiki-e/install-action@zola
+
+      # The GitHub Action for Pages handles the rest
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build with Zola
+        # Tell Zola to build the site into the default `public` directory
+        run: zola build
+
+      - name: Upload artifact
+        # Automatically uploads the `public` folder for deployment
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
