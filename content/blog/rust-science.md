@@ -9,9 +9,6 @@ categories = ["Journal"]
 
 In Materials Science, we often write prototype simulations in Python and production codes in Fortran. Rust offers a third way.
 
-{% callout(title="Hypothesis") %}
-Rust can match the speed of Fortran while offering the package management of Python.
-{% end %}
 
 ### The Iterator Pattern
 Consider calculating the average energy of a lattice:
