@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>Porosity Lab</title>
+<script type="module">
+import init, * as bindings from '/demos/porosity_lab/porosity_lab-ee726b545035170.js';
+const wasm = await init({ module_or_path: '/demos/porosity_lab/porosity_lab-ee726b545035170_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script><style>body{margin:0;background:transparent;color:#aaa;font-family:monospace;overflow:hidden;}canvas{display:block;width:100vw;height:100vh;image-rendering:pixelated;background:#111;}#ui{position:absolute;top:15px;left:15px;background:rgba(30,30,30,0.85);backdrop-filter:blur(8px);padding:15px;border-radius:8px;width:240px;border:1px solid #444;}.row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:12px;}input[type=range]{width:100%;margin-bottom:12px;}button{width:100%;padding:8px;background:#666;border:none;cursor:pointer;color:#fff;font-weight:bold;border-radius:4px;}button:hover{background:#888;}</style><link rel="modulepreload" href="/demos/porosity_lab/porosity_lab-ee726b545035170.js" crossorigin="anonymous" integrity="sha384-tD8DJNd+vI2sFuMfuBEKwQ2jzJIdgXrD9yM0T9MyujYLc4g+vnrnTPXIPT4lp0pI"><link rel="preload" href="/demos/porosity_lab/porosity_lab-ee726b545035170_bg.wasm" crossorigin="anonymous" integrity="sha384-4Wp/MFrKVxG3ExWaZMONSfWUgsUQs68HLCfvlGtJD6dtwz5iNAGqi/mMzpnZS9DU" as="fetch" type="application/wasm"></head><body><canvas id="canvas"></canvas><div id="ui"><div class="row"><label>TARGET P</label><span id="val-p">0.40</span></div><input type="range" id="input-p" min="0.05" max="0.95" step="0.01" value="0.40"><div class="row"><label>SCALE</label><span id="val-s">20</span></div><input type="range" id="input-s" min="5" max="100" step="1" value="20"><div style="font-size:10px; color:#aaa; margin-bottom:10px; display:flex; justify-content:space-between;"><span>TOT: <span id="stat-total">--</span></span><span style="color:#8f8">ACC: <span id="stat-access">--</span></span><span style="color:#f88">ISO: <span id="stat-iso">--</span></span></div><button id="regen">REGENERATE</button></div></body></html>

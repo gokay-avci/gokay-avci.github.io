@@ -1,0 +1,15 @@
+<div class="sim-container">
+    <div class="sim-header">
+        <span class="sim-status">ACTIVE :: {{ title | upper }}</span>
+        <a class="sim-link" href="/{{ path }}" target="_blank">
+            Open Fullscreen ↗
+        </a>
+    </div>
+    <iframe 
+        class="sim-frame" 
+        src="/{{ path }}" 
+        title="{{ title }}"
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-pointer-lock">
+    </iframe>
+</div>

@@ -1,0 +1,20 @@
+# Required by the theme
+language_locale = "hu_HU"
+language_date_format = "%Y. %b. %-e."
+
+words = "szó"
+minute = "perc"
+minutes = "perc"
+read = "Tovább"
+
+
+# Required by the theme
+# (depending on enabled features of the theme)
+search = "Keresés"
+language = "Nyelv"
+language_name = "Magyar"
+change_language = "Nyelv megváltoztatása"
+theme = "Téma"
+
+email = "E-mail"
+phone = "Telefon"

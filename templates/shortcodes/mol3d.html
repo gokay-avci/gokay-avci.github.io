@@ -1,0 +1,30 @@
+<!-- Load Libs safely -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+
+<div class="mol-wrapper" id="mol-{{ id }}"></div>
+<div style="text-align:center; font-size:0.8rem; opacity:0.7; margin-bottom: 2rem;">
+    <strong>Interaction:</strong> Left-Click Rotate | Scroll Zoom | Right-Click Pan
+</div>
+
+<script>
+    $(document).ready(function() {
+        let element = $("#mol-{{ id }}");
+        // Ensure height is computed before render
+        element.height(400); 
+        
+        let config = { backgroundColor: "black" };
+        let viewer = $3Dmol.createViewer(element, config);
+        
+        $3Dmol.download("pdb:{{ pdb }}", viewer, {multimodel:true, frames:true}, function() {
+            viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
+            viewer.zoomTo();
+            viewer.render();
+            // Subtle rotation animation
+            let angle = 0;
+            setInterval(function(){
+                // user interaction stops auto-rotate usually, keeping it simple here
+            }, 50);
+        });
+    });
+</script>

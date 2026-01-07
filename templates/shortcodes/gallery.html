@@ -1,0 +1,7 @@
+<div class="gallery-grid">
+    {% for img in images %}
+    <div class="gallery-item">
+        <a href="{{ img }}" target="_blank"><img src="{{ img }}" loading="lazy"></a>
+    </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>Grain Growth</title>
+<script type="module">
+import init, * as bindings from '/demos/grains/grains-253c4935afff3914.js';
+const wasm = await init({ module_or_path: '/demos/grains/grains-253c4935afff3914_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script><style>body{margin:0;background:transparent;font-family:sans-serif;overflow:hidden;}canvas{display:block;width:100vw;height:100vh;}#ui{position:absolute;top:20px;left:20px;background:rgba(0,0,0,0.85);padding:15px;border:1px solid #444;border-radius:8px;width:220px;color:#ddd;}h1{margin:0 0 10px 0;font-size:14px;color:#aaa;}button{width:100%;padding:8px;background:#666;border:none;font-weight:bold;cursor:pointer;border-radius:4px;color:white;}button:hover{opacity:0.9;}</style><link rel="modulepreload" href="/demos/grains/grains-253c4935afff3914.js" crossorigin="anonymous" integrity="sha384-D5Pv4zTqnAdV+9+qH2SqsR2+EjqK8pliOSZ0RskyoKovnrPXnkk9tjoygHDqcyf7"><link rel="preload" href="/demos/grains/grains-253c4935afff3914_bg.wasm" crossorigin="anonymous" integrity="sha384-duP7eT60a4K6t1jUCpWknCGltOHBPGyeImiK6Agk/HYipXDyy/AtcThBj6QP9SeG" as="fetch" type="application/wasm"></head><body><canvas id="canvas"></canvas><div id="ui"><h1>MICROSTRUCTURE</h1><button id="reset">QUENCH (RESET)</button></div></body></html>

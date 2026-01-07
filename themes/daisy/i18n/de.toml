@@ -1,0 +1,20 @@
+# Required by the theme
+language_locale = "de_DE"
+language_date_format = "%d. %B %Y"
+
+words = "Wörter"
+minute = "Minute"
+minutes = "Minuten"
+read = "Lesen"
+
+
+# Required by the theme
+# (depending on enabled features of the theme)
+search = "Suchen"
+language = "Sprache"
+language_name = "Deutsch"
+change_language = "Sprache ändern"
+theme = "Farbpalette"
+
+email = "E-Mail"
+phone = "Telefon"
