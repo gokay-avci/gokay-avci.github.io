@@ -57,7 +57,7 @@ jobs:
         # It runs the `zola build` command and uses the `--base-url` flag to override
         # any URL in your local config.toml. This guarantees all links, CSS,
         # and JS paths are generated correctly for your live GitHub Pages site.
-        run: zola build --base-url https://gokay-avci.github.io/gokay-avci.github.io/
+        run: zola build --base-url https://gokay-avci.github.io
 
       - name: Upload Artifact
         # This action packages the finished website (from the '/public' directory)
