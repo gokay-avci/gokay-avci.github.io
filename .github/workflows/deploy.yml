@@ -1,3 +1,22 @@
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # ... steps continue here```
+*   `name: github-pages`: This is the required name for the environment.
+*   `url: ...`: This is a best practice. It tells GitHub to display the final URL of your website directly on the "Actions" page after a successful deployment.
+
+---
+
+### The Full, Final, and Correct `deploy.yml` File
+
+This is it. For absolute clarity, copy and paste this entire block to replace the contents of your `deploy.yml` file. This version includes all the previous fixes and this final one.
+
+```yaml
 name: Build and Deploy Website
 
 on:
@@ -17,6 +36,9 @@ jobs:
   build_and_deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout your repository
         uses: actions/checkout@v4
@@ -37,7 +59,7 @@ jobs:
         # This action packages the website files for deployment
         uses: actions/upload-pages-artifact@v3
         with:
-          # THIS IS THE FIX: Tell the action to upload the 'public' directory
+          # Tell the action to upload the 'public' directory
           path: './public'
 
       - name: Deploy to GitHub Pages
