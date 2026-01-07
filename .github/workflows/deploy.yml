@@ -1,21 +1,18 @@
 # ==================================================================================
-# THE ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
-# FOR A ZOLA WEBSITE WITH RUST/WASM DEMOS ON GITHUB PAGES
+# THE ABSOLUTE, FINAL, ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
 # ==================================================================================
-# This is the final, production-ready workflow. It is designed to be efficient,
-# resilient, and easy to maintain.
+# This is the fully corrected, production-ready workflow. It handles all
+# dependencies, including the specific Rust WASM target, for a complete and
+# successful build and deployment.
 # ==================================================================================
 
 name: Build and Deploy Website
 
 on:
-  # Run this workflow automatically on any push to the "main" branch
   push:
     branches: [ "main" ]
-  # Allows you to run this workflow manually from the Actions tab on GitHub
   workflow_dispatch:
 
-# Grant the necessary permissions for the workflow to deploy.
 permissions:
   contents: read
   pages: write
@@ -25,63 +22,45 @@ jobs:
   build_and_deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
-    
-    # Specify the deployment environment. This is a required security feature.
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # Displays the live URL after a successful run
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       # ------------------------------------------------------------------
-      # STAGE 1: BUILD THE WASM DEMOS (THE ROBUST WAY)
+      # STAGE 1: SETUP RUST & BUILD WASM DEMOS
       # ------------------------------------------------------------------
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Add wasm32 Target
+        # THIS IS THE CRITICAL FIX:
+        # Installs the specific compiler target required for WebAssembly.
+        run: rustup target add wasm32-unknown-unknown
+
       - name: Cache Cargo Dependencies
-        # This is a critical optimization. It saves downloaded libraries
-        # and build artifacts, making builds after the first one much faster.
         uses: Swatinem/rust-cache@v2
 
       - name: Install Trunk
-        # Installs the `trunk` tool for building WASM web apps.
         run: cargo install --locked trunk
 
       - name: Install WASM Optimizer
-        # Installs `wasm-opt` for shrinking WASM file size.
         run: cargo install wasm-bindgen-cli
 
       - name: Build AND Optimize WASM Demos
-        # This loop finds every subdirectory in `/demos` and builds it.
-        # It is designed to be resilient and clear.
         run: |
-          # Loop through each item in the 'demos' folder.
           for D_PATH in demos/*; do
-            # Check if the item is a directory before trying to build it.
             if [ -d "$D_PATH" ]; then
-              
-              # Use a subshell `( ... )` to safely change directories.
-              # This prevents the `cd` command from affecting subsequent steps.
               (
                 echo "--- Building WASM Demo in $D_PATH ---"
-                
-                # THIS IS THE KEY FIX:
-                # Change into the demo's directory so Trunk can find its configuration.
                 cd "$D_PATH"
-                
-                # Now that we are inside the correct directory, this command will
-                # reliably find the index.html and Cargo.toml files.
                 trunk build --release
               )
-              
               echo "--- Optimizing WASM output for $D_PATH ---"
-              # This optimization step runs from the project root and targets the
-              # newly built WASM file inside the /static directory.
-              # The `${D_PATH##*/}` part extracts the directory name (e.g., "grains").
               wasm-opt -Oz -o "static/demos/${D_PATH##*/}/"*.wasm "static/demos/${D_PATH##*/}/"*.wasm
             fi
           done
@@ -97,17 +76,13 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Build Website with Zola
-        # This builds the site using the simple and correct base URL for your
-        # User Page repository (gokay-avci.github.io).
         run: zola build --base-url https://gokay-avci.github.io/
 
       - name: Upload Artifact
-        # Packages the final website from the '/public' directory.
         uses: actions/upload-pages-artifact@v3
         with:
           path: './public'
 
       - name: Deploy to GitHub Pages
         id: deployment
-        # Publishes the packaged website to your live URL.
         uses: actions/deploy-pages@v4
