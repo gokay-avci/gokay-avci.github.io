@@ -1,20 +1,12 @@
 # ==================================================================================
-# THE ULTIMATE DEPLOYMENT WORKFLOW
+# THE ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
 # FOR A ZOLA WEBSITE WITH RUST/WASM DEMOS ON GITHUB PAGES
 # ==================================================================================
-# This workflow is the final, corrected version. It automatically:
-#
-# 1. Checks out your source code.
-# 2. Installs the Rust toolchain and the Trunk WASM builder.
-# 3. Caches Rust dependencies for incredibly fast subsequent builds.
-# 4. Compiles each of your WASM demos in optimized release mode.
-# 5. Shrinks the compiled WASM files for faster site loading.
-# 6. Installs Zola.
-# 7. Builds your Zola site using the correct, simple `base_url` for a User Page.
-# 8. Deploys the final website to GitHub Pages.
+# This is the final, production-ready workflow. It is designed to be efficient,
+# resilient, and easy to maintain.
 # ==================================================================================
 
-name: Build and Deploy Zola Website with WASM
+name: Build and Deploy Website
 
 on:
   # Run this workflow automatically on any push to the "main" branch
@@ -34,7 +26,7 @@ jobs:
     name: Build and Deploy
     runs-on: ubuntu-latest
     
-    # Specify the deployment environment, which is required for GitHub Pages.
+    # Specify the deployment environment. This is a required security feature.
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }} # Displays the live URL after a successful run
@@ -44,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       # ------------------------------------------------------------------
-      # STAGE 1: BUILD THE WASM DEMOS
+      # STAGE 1: BUILD THE WASM DEMOS (THE ROBUST WAY)
       # ------------------------------------------------------------------
 
       - name: Install Rust Toolchain
@@ -65,18 +57,32 @@ jobs:
 
       - name: Build AND Optimize WASM Demos
         # This loop finds every subdirectory in `/demos` and builds it.
+        # It is designed to be resilient and clear.
         run: |
-          for D in demos/*; do
-            if [ -d "$D" ]; then
-              echo "Building WASM Demo in $D..."
-              # THIS IS THE CORRECTED COMMAND:
-              # The project path is the main argument, --release is a modifying flag.
-              trunk build "$D" --release
+          # Loop through each item in the 'demos' folder.
+          for D_PATH in demos/*; do
+            # Check if the item is a directory before trying to build it.
+            if [ -d "$D_PATH" ]; then
               
-              echo "Optimizing WASM output for $D..."
-              # This command finds the WASM file Trunk just built and shrinks it.
-              # The `-Oz` flag optimizes aggressively for size.
-              wasm-opt -Oz -o "static/demos/${D##*/}/"*.wasm "static/demos/${D##*/}/"*.wasm
+              # Use a subshell `( ... )` to safely change directories.
+              # This prevents the `cd` command from affecting subsequent steps.
+              (
+                echo "--- Building WASM Demo in $D_PATH ---"
+                
+                # THIS IS THE KEY FIX:
+                # Change into the demo's directory so Trunk can find its configuration.
+                cd "$D_PATH"
+                
+                # Now that we are inside the correct directory, this command will
+                # reliably find the index.html and Cargo.toml files.
+                trunk build --release
+              )
+              
+              echo "--- Optimizing WASM output for $D_PATH ---"
+              # This optimization step runs from the project root and targets the
+              # newly built WASM file inside the /static directory.
+              # The `${D_PATH##*/}` part extracts the directory name (e.g., "grains").
+              wasm-opt -Oz -o "static/demos/${D_PATH##*/}/"*.wasm "static/demos/${D_PATH##*/}/"*.wasm
             fi
           done
 
