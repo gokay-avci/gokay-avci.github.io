@@ -1,8 +1,8 @@
 # ==================================================================================
-# THE ABSOLUTE, FINAL, TRULY ROBUST DEPLOYMENT WORKFLOW
+# THE FINAL, ULTIMATE, & SIMPLIFIED DEPLOYMENT WORKFLOW
 # ==================================================================================
-# This is the fully corrected, production-ready workflow. It handles all
-# dependencies and uses absolute paths for installed tools to guarantee success.
+# This is the fully corrected, production-ready workflow. It reliably builds
+# the WASM demos and Zola site without the extra complexity of optimization steps.
 # ==================================================================================
 
 name: Build and Deploy Website
@@ -37,30 +37,28 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Add wasm32 Target
+        # Installs the specific compiler target required for WebAssembly.
         run: rustup target add wasm32-unknown-unknown
 
       - name: Cache Cargo Dependencies
+        # This critical optimization makes builds after the first one much faster.
         uses: Swatinem/rust-cache@v2
 
-      - name: Install Rust Build Tools (Trunk & wasm-bindgen)
-        # We only need wasm-bindgen-cli for wasm-opt
-        run: |
-          cargo install --locked trunk
-          cargo install wasm-bindgen-cli
+      - name: Install Trunk
+        # Installs the `trunk` tool needed to build the WASM demos.
+        run: cargo install --locked trunk
 
-      - name: Build AND Optimize WASM Demos
+      - name: Build WASM Demos
+        # This loop finds every subdirectory in `/demos` and builds it.
         run: |
           for D_PATH in demos/*; do
             if [ -d "$D_PATH" ]; then
+              # Use a subshell to safely change directories for each build.
               (
                 echo "--- Building WASM Demo in $D_PATH ---"
                 cd "$D_PATH"
                 trunk build --release
               )
-              echo "--- Optimizing WASM output for $D_PATH ---"
-              # THIS IS THE FINAL FIX:
-              # Use the absolute path to the wasm-opt executable to avoid PATH issues.
-              $HOME/.cargo/bin/wasm-opt -Oz -o "static/demos/${D_PATH##*/}/"*.wasm "static/demos/${D_PATH##*/}/"*.wasm
             fi
           done
 
@@ -75,13 +73,16 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Build Website with Zola
+        # Builds the site using the correct base URL for your User Page.
         run: zola build --base-url https://gokay-avci.github.io/
 
       - name: Upload Artifact
+        # Packages the final website from the '/public' directory.
         uses: actions/upload-pages-artifact@v3
         with:
           path: './public'
 
       - name: Deploy to GitHub Pages
         id: deployment
+        # Publishes the packaged website to your live URL.
         uses: actions/deploy-pages@v4
