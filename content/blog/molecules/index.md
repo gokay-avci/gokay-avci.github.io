@@ -1,6 +1,6 @@
 +++
 title = "Molecular Dynamics Visualization"
-date = 2025-02-25
+date = 2025-01-03
 description = "WebGL visualization of PDB data."
 [taxonomies]
 tags = ["WebGL", "Biology"]

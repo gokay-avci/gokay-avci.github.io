@@ -1,6 +1,6 @@
 +++
 title = "Automated Data Pipelines"
-date = 2025-02-24
+date = 2025-01-01
 description = "Rendering CSV files as HTML."
 [taxonomies]
 tags = ["Data"]

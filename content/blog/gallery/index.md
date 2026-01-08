@@ -1,6 +1,6 @@
 +++
 title = "High-Throughput Microscopy"
-date = 2025-02-23
+date = 2025-01-02
 description = "Gallery rendering test."
 [taxonomies]
 tags = ["Imaging"]
