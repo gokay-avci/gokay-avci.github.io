@@ -1,9 +1,8 @@
 # ==================================================================================
-# THE ABSOLUTE, FINAL, ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
+# THE ABSOLUTE, FINAL, FINAL, ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
 # ==================================================================================
 # This is the fully corrected, production-ready workflow. It handles all
-# dependencies, including the specific Rust WASM target, for a complete and
-# successful build and deployment.
+# dependencies, including the Rust WASM target and the PATH for installed tools.
 # ==================================================================================
 
 name: Build and Deploy Website
@@ -38,18 +37,20 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Add wasm32 Target
-        # THIS IS THE CRITICAL FIX:
-        # Installs the specific compiler target required for WebAssembly.
         run: rustup target add wasm32-unknown-unknown
 
       - name: Cache Cargo Dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Install Trunk
-        run: cargo install --locked trunk
-
-      - name: Install WASM Optimizer
-        run: cargo install wasm-bindgen-cli
+      - name: Install Rust Build Tools (Trunk & wasm-opt)
+        # We install all necessary Rust-based tools in one step.
+        run: |
+          cargo install --locked trunk
+          cargo install wasm-bindgen-cli
+          # THIS IS THE CRITICAL FIX:
+          # Add the cargo binary directory to the GITHUB_PATH. This makes
+          # installed tools like `wasm-opt` available to subsequent steps.
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Build AND Optimize WASM Demos
         run: |
