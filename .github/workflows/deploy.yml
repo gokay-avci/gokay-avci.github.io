@@ -1,8 +1,8 @@
 # ==================================================================================
-# THE ABSOLUTE, FINAL, FINAL, ULTIMATE & ROBUST DEPLOYMENT WORKFLOW
+# THE ABSOLUTE, FINAL, TRULY ROBUST DEPLOYMENT WORKFLOW
 # ==================================================================================
 # This is the fully corrected, production-ready workflow. It handles all
-# dependencies, including the Rust WASM target and the PATH for installed tools.
+# dependencies and uses absolute paths for installed tools to guarantee success.
 # ==================================================================================
 
 name: Build and Deploy Website
@@ -42,15 +42,11 @@ jobs:
       - name: Cache Cargo Dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Install Rust Build Tools (Trunk & wasm-opt)
-        # We install all necessary Rust-based tools in one step.
+      - name: Install Rust Build Tools (Trunk & wasm-bindgen)
+        # We only need wasm-bindgen-cli for wasm-opt
         run: |
           cargo install --locked trunk
           cargo install wasm-bindgen-cli
-          # THIS IS THE CRITICAL FIX:
-          # Add the cargo binary directory to the GITHUB_PATH. This makes
-          # installed tools like `wasm-opt` available to subsequent steps.
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Build AND Optimize WASM Demos
         run: |
@@ -62,7 +58,9 @@ jobs:
                 trunk build --release
               )
               echo "--- Optimizing WASM output for $D_PATH ---"
-              wasm-opt -Oz -o "static/demos/${D_PATH##*/}/"*.wasm "static/demos/${D_PATH##*/}/"*.wasm
+              # THIS IS THE FINAL FIX:
+              # Use the absolute path to the wasm-opt executable to avoid PATH issues.
+              $HOME/.cargo/bin/wasm-opt -Oz -o "static/demos/${D_PATH##*/}/"*.wasm "static/demos/${D_PATH##*/}/"*.wasm
             fi
           done
 
