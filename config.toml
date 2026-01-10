@@ -90,11 +90,14 @@ github = "gokay-avci"
 twitter = "---"
 email = "gavci@u.lab"
 
+# IMPORTANT: this enables the theme dropdown in the navbar
 enable_theme_switching = true
-theme_toggle = true
-daisyui_theme_light = "Emerald"
-daisyui_theme_dark = "Forest"
 
+# defaults (use lowercase theme identifiers)
+daisyui_theme_light = "emerald"
+daisyui_theme_dark = "forest"
+
+# Optional: only needed if the theme expects a list from config for the dropdown
 daisyui_themes = [
   "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
   "synthwave", "retro", "cyberpunk", "valentine", "halloween",
