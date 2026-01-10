@@ -1,0 +1,159 @@
+{# templates/shortcodes/home_daisy.html
+   Inline shortcode: use as {{ home_daisy(...) }}
+   No get_section/get_page calls (they are not available in shortcodes).
+#}
+
+{% set name = name | default(value="Gokay Avci") %}
+{% set headline = headline | default(value="Computational Matter") %}
+{% set tagline = tagline | default(value="Computational Materials Scientist → Systems Engineering") %}
+{% set blurb = blurb | default(value="I build reproducible, HPC-ready pipelines for porous molecular materials — from candidate generation and screening to high-fidelity anchoring — and ship scientific tooling in Rust/WASM.") %}
+
+{% set image = image | default(value="img/me.jpg") %}
+{% set image_alt = image_alt | default(value="Portrait photo") %}
+
+{% set btn1_href = btn1_href | default(value="/projects/") %}
+{% set btn1_label = btn1_label | default(value="Projects") %}
+{% set btn2_href = btn2_href | default(value="/blog/") %}
+{% set btn2_label = btn2_label | default(value="Blog") %}
+{% set btn3_href = btn3_href | default(value="/lab/") %}
+{% set btn3_label = btn3_label | default(value="Lab") %}
+{% set btn4_href = btn4_href | default(value="/CV/") %}
+{% set btn4_label = btn4_label | default(value="CV") %}
+
+{% set pill_1 = pill_1 | default(value="Porous materials") %}
+{% set pill_2 = pill_2 | default(value="Host–guest chemistry") %}
+{% set pill_3 = pill_3 | default(value="HPC workflows") %}
+{% set pill_4 = pill_4 | default(value="Rust • WASM • WGPU") %}
+
+<section class="not-prose">
+  <!-- HERO -->
+  <div class="hero rounded-3xl bg-base-200">
+    <div class="hero-content flex-col items-start gap-8 lg:flex-row lg:items-center lg:gap-10">
+
+      <div class="flex items-center gap-5">
+        <div class="avatar">
+          <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-4 lg:w-28">
+            <img src="/{{ image }}" alt="{{ image_alt }}" loading="lazy" />
+          </div>
+        </div>
+        <div>
+          <div class="text-sm opacity-70">Hi, I’m</div>
+          <div class="text-2xl font-bold leading-tight">{{ name }}</div>
+          <div class="text-sm opacity-80">{{ tagline }}</div>
+        </div>
+      </div>
+
+      <div class="max-w-3xl">
+        <h1 class="text-4xl font-bold tracking-tight lg:text-5xl">
+          {{ headline }}
+        </h1>
+
+        <p class="mt-3 text-base leading-relaxed opacity-90 lg:text-lg">
+          {{ blurb }}
+        </p>
+
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span class="badge badge-primary badge-outline">UK-based</span>
+          <span class="badge badge-ghost">{{ pill_1 }}</span>
+          <span class="badge badge-ghost">{{ pill_2 }}</span>
+          <span class="badge badge-ghost">{{ pill_3 }}</span>
+          <span class="badge badge-ghost">{{ pill_4 }}</span>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href="{{ btn1_href }}">{{ btn1_label }}</a>
+          <a class="btn btn-outline" href="{{ btn2_href }}">{{ btn2_label }}</a>
+          <a class="btn btn-ghost" href="{{ btn3_href }}">{{ btn3_label }}</a>
+          <a class="btn btn-ghost" href="{{ btn4_href }}">{{ btn4_label }}</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- QUICK START (tabs-style navigation) -->
+  <div class="mt-8">
+    <div class="tabs tabs-boxed">
+      <a class="tab tab-active" href="{{ btn1_href }}">Start with Projects</a>
+      <a class="tab" href="{{ btn3_href }}">Then Lab</a>
+      <a class="tab" href="{{ btn2_href }}">Then Blog</a>
+    </div>
+  </div>
+
+  <!-- “NOW” + “FOCUS” cards (compact + scannable) -->
+  <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Now</h2>
+        <ul class="mt-1 list-disc pl-5 text-sm leading-relaxed opacity-85">
+          <li>Scaling molecular discovery pipelines (generate → screen → anchor)</li>
+          <li>CO₂-to-fuel catalysis concepts in porous molecular materials</li>
+          <li>Rust-first workflow tooling with cluster realities in mind</li>
+        </ul>
+        <div class="card-actions justify-end">
+          <a class="link link-hover text-sm" href="{{ btn3_href }}">See experiments →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow lg:col-span-2">
+      <div class="card-body">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 class="card-title">Focus</h2>
+          <span class="text-xs opacity-70">What you’ll find here</span>
+        </div>
+
+        <!-- Stats block (reads beautifully on Daisy themes) -->
+        <div class="stats stats-vertical mt-2 w-full bg-base-200 shadow-sm md:stats-horizontal">
+          <div class="stat">
+            <div class="stat-title">Materials</div>
+            <div class="stat-value text-2xl">MOFs • Cages</div>
+            <div class="stat-desc opacity-70">Porosity, selectivity, host–guest</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Compute</div>
+            <div class="stat-value text-2xl">HPC</div>
+            <div class="stat-desc opacity-70">I/O-aware, reproducible pipelines</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Tooling</div>
+            <div class="stat-value text-2xl">Rust/WASM</div>
+            <div class="stat-desc opacity-70">Fast visualisation + robust systems</div>
+          </div>
+        </div>
+
+        <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <a class="card bg-base-200 hover:shadow transition" href="{{ btn1_href }}">
+            <div class="card-body p-4">
+              <div class="font-semibold">Projects</div>
+              <div class="text-sm opacity-80">Polished tools & pipelines</div>
+            </div>
+          </a>
+          <a class="card bg-base-200 hover:shadow transition" href="{{ btn3_href }}">
+            <div class="card-body p-4">
+              <div class="font-semibold">Lab</div>
+              <div class="text-sm opacity-80">Prototypes & runnable demos</div>
+            </div>
+          </a>
+          <a class="card bg-base-200 hover:shadow transition" href="{{ btn2_href }}">
+            <div class="card-body p-4">
+              <div class="font-semibold">Blog</div>
+              <div class="text-sm opacity-80">Notes & patterns that stick</div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- subtle footer note -->
+  <div class="mt-8 rounded-2xl bg-base-200 p-5">
+    <div class="text-sm opacity-80">
+      Want the quickest overview? Open <a class="link link-hover" href="{{ btn4_href }}">CV</a>, then jump to <a class="link link-hover" href="{{ btn1_href }}">Projects</a>.
+      For collaborations around porous materials, workflows, or Rust/WASM tooling, use the social links in the header/footer.
+    </div>
+  </div>
+</section>

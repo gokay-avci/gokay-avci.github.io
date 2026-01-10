@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/landing.css">
+
+<div class="landing" data-theme="corporate">
+  <main class="landing-wrap">
+
+    <!-- HERO -->
+    <section class="landing-hero">
+      <div class="landing-portrait">
+        <div class="avatar">
+          <div class="w-24 md:w-28 rounded-full ring ring-neutral/20 ring-offset-base-100 ring-offset-4">
+            <img src="/img/me.jpg" alt="Portrait photo of me" loading="lazy" />
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-copy">
+        <p class="landing-kicker">Welcome</p>
+        <h1 class="landing-title">Gokay Avci</h1>
+
+        <p class="landing-lead">
+          I’m a computational materials scientist pivoting into systems engineering — building reproducible, HPC-ready pipelines for
+          porous molecular materials, and robust scientific tooling in Rust/WASM.
+        </p>
+
+        <p class="landing-sub">
+          Porous materials • host–guest chemistry • workflow orchestration • simulation→ML acceleration • GPU-first visualisation
+        </p>
+
+        <!-- gentle “invitation” row (not messy links; one subtle action) -->
+        <div class="landing-invite">
+          <span class="landing-muted">If you’re new:</span>
+          <span class="landing-chip">start with the recent projects below</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="landing-rule"></div>
+
+    <!-- RECENT PROJECTS -->
+    <section class="landing-section">
+      <div class="landing-section-head">
+        <h2 class="landing-h2">Recent projects</h2>
+        <p class="landing-muted">A small, curated selection for first-time visitors.</p>
+      </div>
+
+      {% set projects = get_section(path="projects/_index.md") %}
+
+      {% if projects.pages | length > 0 %}
+        <div class="landing-grid">
+          {% for p in projects.pages | slice(end=4) %}
+            <article class="landing-card">
+
+              {% if p.extra.cover %}
+                <a class="landing-card-media" href="{{ p.permalink }}" aria-label="Open project: {{ p.title }}">
+                  <img
+                    src="/{{ p.extra.cover }}"
+                    alt="{{ p.extra.cover_alt | default(value=p.title) }}"
+                    loading="lazy"
+                  />
+                </a>
+              {% endif %}
+
+              <div class="landing-card-body">
+                <div class="landing-card-top">
+                  <h3 class="landing-h3">
+                    <a href="{{ p.permalink }}" class="landing-link">{{ p.title }}</a>
+                  </h3>
+
+                  {% if p.date %}
+                    <div class="landing-date">{{ p.date }}</div>
+                  {% endif %}
+                </div>
+
+                {% if p.description %}
+                  <p class="landing-desc">{{ p.description }}</p>
+                {% elif p.summary %}
+                  <p class="landing-desc">{{ p.summary | striptags | truncate(length=160) }}</p>
+                {% else %}
+                  <p class="landing-desc">A project note and implementation details.</p>
+                {% endif %}
+
+                {% if p.taxonomies and p.taxonomies.tags %}
+                  <div class="landing-tags">
+                    {% for t in p.taxonomies.tags | slice(end=3) %}
+                      <span class="badge badge-outline">{{ t }}</span>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="landing-empty">
+          <p class="landing-muted">
+            No projects found yet. Add pages under <code>content/projects/</code> and ensure <code>content/projects/_index.md</code> exists.
+          </p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="landing-foot">
+      <p class="landing-muted">
+        The home page is intentionally quiet; navigation and sections do the heavy lifting.
+      </p>
+    </section>
+
+  </main>
+</div>
+{% endblock content %}

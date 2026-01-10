@@ -49,6 +49,7 @@ links = [
     { url = "projects", i18n_key = "nav_projects" },
     { url = "blog", i18n_key = "nav_journal" },
     { url = "CV", i18n_key = "nav_CV" },
+    #{ url = "/files/Gokay_Avci_CV.pdf", name = "CV" },
 ]
 
 [extra.footer]

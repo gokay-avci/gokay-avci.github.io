@@ -6,6 +6,10 @@ weight = 1
 [taxonomies]
 tags = ["Rust", "WASM", "Materials"]
 categories = ["Projects"]
+
+[extra]
+cover = "projects/hpc.jpg"
+cover_alt = "Fitness landscape visualisation"
 +++
 
 **Status**: Active | **Stack**: Rust, Trunk, Web-Sys
