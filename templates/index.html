@@ -1,9 +1,12 @@
-{% extends "base.html" %}
+{% extends "daisy/templates/base.html" %}
+
+{% block extra_headers %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ get_url(path='landing.css') }}">
+{% endblock extra_headers %}
 
 {% block content %}
-<link rel="stylesheet" href="/landing.css">
-
-<div class="landing"> <!data-theme="corporate">
+<div class="landing">
   <main class="landing-wrap">
 
     <!-- HERO -->
@@ -11,7 +14,7 @@
       <div class="landing-portrait">
         <div class="avatar">
           <div class="w-24 md:w-28 rounded-full ring ring-neutral/20 ring-offset-base-100 ring-offset-4">
-            <img src="/img/me.jpg" alt="Portrait photo of me" loading="lazy" />
+            <img src="{{ get_url(path='img/me.jpg') }}" alt="Portrait photo of me" loading="lazy" />
           </div>
         </div>
       </div>
@@ -29,7 +32,6 @@
           Porous materials • host–guest chemistry • workflow orchestration • simulation→ML acceleration • GPU-first visualisation
         </p>
 
-        <!-- gentle “invitation” row (not messy links; one subtle action) -->
         <div class="landing-invite">
           <span class="landing-muted">If you’re new:</span>
           <span class="landing-chip">start with the recent projects below</span>
@@ -53,11 +55,20 @@
           {% for p in projects.pages | slice(end=4) %}
             <article class="landing-card">
 
-              {% if p.extra.cover %}
+              {% set cover = "" %}
+              {% if p.extra is defined and p.extra.cover is defined %}
+                {% if p.extra.cover is iterable and p.extra.cover is not string %}
+                  {% set cover = p.extra.cover | first %}
+                {% else %}
+                  {% set cover = p.extra.cover %}
+                {% endif %}
+              {% endif %}
+
+              {% if cover and cover | length > 0 %}
                 <a class="landing-card-media" href="{{ p.permalink }}" aria-label="Open project: {{ p.title }}">
                   <img
-                    src="/{{ p.extra.cover }}"
-                    alt="{{ p.extra.cover_alt | default(value=p.title) }}"
+                    src="{{ get_url(path=cover) }}"
+                    alt="{% if p.extra is defined and p.extra.cover_alt is defined %}{{ p.extra.cover_alt }}{% else %}{{ p.title }}{% endif %}"
                     loading="lazy"
                   />
                 </a>
@@ -70,7 +81,10 @@
                   </h3>
 
                   {% if p.date %}
-                    <div class="landing-date">{{ p.date }}</div>
+                    <div class="landing-date">
+  {{ p.date | date(format=i18n_user['language_date_format'] | default(value=i18n['language_date_format']),
+                   locale=i18n_user['language_locale'] | default(value=i18n['language_locale'])) }}
+					</div>
                   {% endif %}
                 </div>
 

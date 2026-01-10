@@ -1,1 +1,66 @@
-<div class="sci-table-wrapper">{{ load_data(path=path) | safe }}</div>
+{# templates/shortcodes/csv_table.html
+   Zola 0.22 compatible.
+
+   Minimal usage (recommended):
+     {{ csv_table() }}
+   Assumes a colocated CSV file named: data.csv
+
+   Optional:
+     {{ csv_table(file="tensile_data.csv", caption="Mechanical properties", limit=25) }}
+#}
+
+{% set file = file | default(value="data.csv") %}
+{% set caption = caption | default(value="") %}
+{% set limit = limit | default(value=0) %}
+{% set class = class | default(value="table table-zebra w-full") %}
+
+{# Resolve colocated path #}
+{% set path = page.colocated_path ~ file %}
+
+{# Try loading. If file is missing, Zola will error; so you MUST keep data.csv present for posts that call this shortcode. #}
+{% set csv = load_data(path=path, format="csv") %}
+
+{% if csv is not defined or csv.records is not defined or csv.records | length == 0 %}
+  <div class="alert">
+    <span>No rows found in <code>{{ file }}</code> (expected at: <code>{{ path }}</code>).</span>
+  </div>
+{% else %}
+  {% set total = csv.records | length %}
+  {% if limit and limit > 0 and limit < total %}
+    {% set rows = csv.records | slice(end=limit) %}
+  {% else %}
+    {% set rows = csv.records %}
+  {% endif %}
+
+  <div class="overflow-x-auto">
+    <table class="{{ class }}">
+      {% if caption and caption | length > 0 %}
+        <caption class="text-left text-sm opacity-70 py-2">{{ caption }}</caption>
+      {% endif %}
+
+      <thead>
+        <tr>
+          {% for h in csv.headers %}
+            <th>{{ h }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            {% for cell in row %}
+              <td>{{ cell }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if limit and limit > 0 and limit < total %}
+    <p class="mt-2 text-sm opacity-70">
+      Showing {{ limit }} of {{ total }} rows from <code>{{ file }}</code>.
+    </p>
+  {% endif %}
+{% endif %}
