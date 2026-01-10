@@ -1,4 +1,4 @@
-base_url = "gokay-avci.github.io"
+base_url = "https://gokay-avci.github.io"
 title = "Avci Lab"
 description = "Computational Materials Science Personal Website"
 default_language = "en"
@@ -7,14 +7,15 @@ build_search_index = true
 generate_feeds = true
 
 taxonomies = [
-    { name = "tags", paginate_by = 10, rss = true },
-    { name = "categories", paginate_by = 10, rss = true },
+  { name = "tags", paginate_by = 10, rss = true },
+  { name = "categories", paginate_by = 10, rss = true },
 ]
 
 [markdown]
-highlighting = true
-#highlight_theme = "base16-ocean-dark"
 render_emoji = true
+
+[markdown.highlighting]
+enable = true
 
 [search]
 index_format = "elasticlunr_json"
@@ -22,35 +23,30 @@ include_title = true
 include_content = true
 
 [extra]
-# --- DAISY SETTINGS ---
 github = "gokay-avci"
 twitter = "---"
 email = "gavci@u.lab"
 
-# Theme Toggle Logic
 enable_theme_switching = false
 theme_toggle = true
 daisyui_theme_light = "Emerald"
 daisyui_theme_dark = "Forest"
 
-# THEME LIST (Required for Dropdown)
 daisyui_themes = [
-    "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", 
-    "synthwave", "retro", "cyberpunk", "valentine", "halloween", 
-    "garden", "forest", "aqua", "lofi", "pastel", "fantasy", 
-    "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", 
-    "business", "acid", "lemonade", "night", "coffee", "winter"
+  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
+  "synthwave", "retro", "cyberpunk", "valentine", "halloween",
+  "garden", "forest", "aqua", "lofi", "pastel", "fantasy",
+  "wireframe", "black", "luxury", "dracula", "cmyk", "autumn",
+  "business", "acid", "lemonade", "night", "coffee", "winter"
 ]
 
-# Navbar (Keys must exist in i18n/en.toml)
 [extra.navbar]
 links = [
-    { url = "about", i18n_key = "nav_about" },
-    { url = "projects", i18n_key = "nav_projects" },
-    { url = "blog", i18n_key = "nav_journal" },
-    { url = "CV", i18n_key = "nav_CV" },
-    #{ url = "/files/Gokay_Avci_CV.pdf", name = "CV" },
+  { url = "about", i18n_key = "nav_about" },
+  { url = "projects", i18n_key = "nav_projects" },
+  { url = "blog", i18n_key = "nav_journal" },
+  { url = "CV", i18n_key = "nav_CV" },
 ]
 
 [extra.footer]
-notice = '• Built with :heart: by @Gokay Avci 2026 •'
+notice = "• Built with :heart: by @Gokay Avci 2026 •"
