@@ -12,7 +12,7 @@ taxonomies = [
 ]
 
 [markdown]
-highlight_code = true
+highlighting = true
 highlight_theme = "base16-ocean-dark"
 render_emoji = true
 
@@ -28,8 +28,8 @@ twitter = "---"
 email = "gavci@u.lab"
 
 # Theme Toggle Logic
-enable_theme_switching = true
-theme_toggle = false
+enable_theme_switching = false
+theme_toggle = true
 daisyui_theme_light = "Emerald"
 daisyui_theme_dark = "Forest"
 
