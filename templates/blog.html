@@ -2,73 +2,65 @@
 
 {% block content %}
 <style>
-  /* ========= Blog Landing: local UI system (fast + predictable) ========= */
+  /* ===== Blog landing: sane responsive layout + no duplication ===== */
 
-  /* Hide horizontal scrollbar for year bar */
-  .blog-yearbar { -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  /* Year bar: scroll on mobile, wrap on desktop */
+  .blog-yearbar {
+    display: flex;
+    gap: .5rem;
+    overflow-x: auto;
+    padding-bottom: .25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
   .blog-yearbar::-webkit-scrollbar { display: none; }
+  @media (min-width: 1024px) {
+    .blog-yearbar { overflow: visible; flex-wrap: wrap; padding-bottom: 0; }
+  }
 
-  /* Sticky controls only on smaller screens; desktop is static */
-  .blog-sticky { position: sticky; top: 4.75rem; z-index: 20; }
-  @media (min-width: 1024px) { .blog-sticky { position: static; top: auto; } }
+  /* Sticky only for the small filters bar (mobile/tablet). Desktop = normal flow. */
+  .blog-filters-sticky {
+    position: sticky;
+    top: 5rem;           /* sits under Daisy navbar */
+    z-index: 20;
+  }
+  @media (min-width: 1024px) {
+    .blog-filters-sticky { position: static; top: auto; }
+  }
 
-  /* Anchor offsets for header + sticky */
-  .blog-anchor { scroll-margin-top: 11rem; }
-  @media (min-width: 1024px) { .blog-anchor { scroll-margin-top: 6.5rem; } }
+  /* Anchor offsets so year headings don’t hide under sticky bar */
+  .blog-anchor { scroll-margin-top: 12rem; }
+  @media (min-width: 1024px) { .blog-anchor { scroll-margin-top: 7rem; } }
 
-  /* Desktop toolbar layout */
+  /* Desktop toolbar grid: full width, not cramped */
   .blog-toolbar {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto;
     gap: 1rem;
     align-items: center;
   }
 
-  .blog-toolbar-left { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
-  .blog-toolbar-mid  { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; justify-content: flex-start; }
-  .blog-toolbar-right{ display: flex; justify-content: flex-end; }
-
-  /* Make controls comfortably tall on desktop */
+  /* Controls sizing (touch-friendly on mobile; refined on desktop) */
   .blog-pill { border-radius: 9999px; }
-  .blog-control {
-    border-radius: 9999px;
-    min-height: 2.5rem;
-    height: 2.5rem;
-    line-height: 2.5rem;
+  .blog-control { border-radius: 9999px; min-height: 2.75rem; height: 2.75rem; }
+  @media (min-width: 1024px) {
+    .blog-control { min-height: 2.5rem; height: 2.5rem; }
   }
 
-  /* Stable widths so they don’t collapse into tiny boxes */
-  .blog-select { width: 14rem; }
-  .blog-select--tag { width: 12rem; }
-
-  /* On very large screens, give a bit more breathing room */
-  @media (min-width: 1280px) {
+  /* Stable select widths on desktop; full width on mobile */
+  .blog-select { width: 100%; }
+  @media (min-width: 1024px) {
     .blog-select { width: 16rem; }
     .blog-select--tag { width: 13rem; }
   }
 
-  /* On small screens, full width */
-  @media (max-width: 1023px) {
-    .blog-toolbar { display: block; }
-    .blog-select, .blog-select--tag { width: 100%; }
-    .blog-control { min-height: 2.75rem; height: 2.75rem; line-height: 2.75rem; }
-  }
-
-  /* Make the year pills look intentional, not cramped */
-  .blog-yearbtn { padding-left: .9rem; padding-right: .9rem; min-height: 2.5rem; }
-  @media (max-width: 1023px) { .blog-yearbtn { min-height: 2.75rem; } }
-
-  /* Icon sizing consistency */
+  /* Icon sizing */
   .blog-ic { width: 1.05rem; height: 1.05rem; opacity: .72; }
   .blog-ic-sm { width: .95rem; height: .95rem; opacity: .72; }
 
-  /* Prevent label+icon from squeezing select */
-  .blog-field { display: flex; align-items: center; gap: .5rem; }
-  .blog-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; opacity: .6; white-space: nowrap; }
-
-  /* Keep the whole toolbar “card” tall enough */
-  .blog-toolbar-card { padding: 1rem; }
-  @media (min-width: 1024px) { .blog-toolbar-card { padding: 1.1rem 1.25rem; } }
+  /* Post cards */
+  .blog-item { border-radius: 1.5rem; }
+  @media (min-width: 1024px) { .blog-item { border-radius: 1.75rem; } }
 </style>
 
 <div class="container mx-auto px-4">
@@ -90,65 +82,46 @@
     {% set cat_tax = get_taxonomy(kind="categories") %}
     {% set tag_tax = get_taxonomy(kind="tags") %}
 
-    <!-- Controls -->
-    <section class="mt-6 blog-sticky" aria-label="Blog controls">
-      <div class="blog-toolbar-card rounded-3xl border border-base-300/40 bg-base-100/90 backdrop-blur shadow-sm">
+    <!-- Years (single render; scrolls on mobile, wraps on desktop) -->
+    <section class="mt-6" aria-label="Jump to year">
+      <div class="blog-yearbar pr-1">
+        {% for spath in years %}
+          {% set ysec = get_section(path=spath) %}
+          {% set posts = ysec.pages | sort(attribute="date") | reverse %}
+          {% if posts | length > 0 %}
+            <a class="btn btn-sm btn-outline blog-pill whitespace-nowrap"
+               href="#y{{ ysec.title }}"
+               aria-label="Jump to {{ ysec.title }}">
+              <svg class="blog-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M8 2v3M16 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M4.5 9h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5V19A2.5 2.5 0 0 1 18 21.5H6A2.5 2.5 0 0 1 3.5 19V7.5A2.5 2.5 0 0 1 6 5Z"
+                      stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              </svg>
+              <span>{{ ysec.title }}</span>
+              <span class="opacity-60">· {{ posts | length }}</span>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
 
-        <!-- Year pills (desktop: left column; mobile: scroll bar) -->
-        <div class="blog-yearbar flex gap-2 overflow-x-auto pr-2 mb-4 lg:mb-0 lg:hidden" aria-label="Jump to year">
-          {% for spath in years %}
-            {% set ysec = get_section(path=spath) %}
-            {% set posts = ysec.pages | sort(attribute="date") | reverse %}
-            {% if posts | length > 0 %}
-              <a class="btn btn-sm btn-outline blog-pill blog-yearbtn whitespace-nowrap" href="#y{{ ysec.title }}">
-                <svg class="blog-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M8 2v3M16 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                  <path d="M4.5 9h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                  <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5V19A2.5 2.5 0 0 1 18 21.5H6A2.5 2.5 0 0 1 3.5 19V7.5A2.5 2.5 0 0 1 6 5Z"
-                        stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                </svg>
-                {{ ysec.title }} <span class="opacity-60">· {{ posts | length }}</span>
-              </a>
-            {% endif %}
-          {% endfor %}
-        </div>
+    <!-- Filters (sticky only, compact height) -->
+    <section class="mt-4 blog-filters-sticky" aria-label="Blog filters">
+      <div class="rounded-3xl border border-base-300/40 bg-base-100/90 backdrop-blur shadow-sm px-4 py-4">
 
-        <!-- Desktop toolbar -->
         <div class="blog-toolbar">
+          <!-- Left: controls -->
+          <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
 
-          <!-- Left: Years (desktop only) -->
-          <nav class="blog-toolbar-left hidden lg:flex" aria-label="Jump to year">
-            {% for spath in years %}
-              {% set ysec = get_section(path=spath) %}
-              {% set posts = ysec.pages | sort(attribute="date") | reverse %}
-              {% if posts | length > 0 %}
-                <a class="btn btn-sm btn-outline blog-pill blog-yearbtn whitespace-nowrap" href="#y{{ ysec.title }}">
-                  <svg class="blog-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M8 2v3M16 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    <path d="M4.5 9h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5V19A2.5 2.5 0 0 1 18 21.5H6A2.5 2.5 0 0 1 3.5 19V7.5A2.5 2.5 0 0 1 6 5Z"
-                          stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                  </svg>
-                  {{ ysec.title }} <span class="opacity-60">· {{ posts | length }}</span>
-                </a>
-              {% endif %}
-            {% endfor %}
-          </nav>
-
-          <!-- Middle: Filters -->
-          <div class="blog-toolbar-mid">
-            <div class="blog-field">
+            <div class="flex items-center gap-2 text-xs uppercase tracking-wider opacity-60">
               <svg class="blog-ic-sm" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
-              <span class="blog-label">Filter</span>
+              <span>Filter</span>
             </div>
 
-            <div class="blog-field w-full lg:w-auto">
-              <svg class="blog-ic-sm hidden lg:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4.5 7.5h7l1.5 2h6A2.5 2.5 0 0 1 21.5 12v6A2.5 2.5 0 0 1 19 20.5H6A2.5 2.5 0 0 1 3.5 18V10A2.5 2.5 0 0 1 6 7.5Z"
-                      stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-              </svg>
+            <div class="flex items-center gap-2">
               <label class="sr-only" for="filter-category">Category</label>
               <select id="filter-category"
                       class="select select-sm select-bordered blog-control blog-select"
@@ -160,12 +133,7 @@
               </select>
             </div>
 
-            <div class="blog-field w-full lg:w-auto">
-              <svg class="blog-ic-sm hidden lg:block" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M20.5 13.5 13.8 20.2a2.2 2.2 0 0 1-3.1 0L3.8 13.3a2.2 2.2 0 0 1-.6-1.4V5.8A2.3 2.3 0 0 1 5.5 3.5h6.1c.5 0 1 .2 1.4.6l7.5 7.5a2.2 2.2 0 0 1 0 3.1Z"
-                      stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M7.7 7.7h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-              </svg>
+            <div class="flex items-center gap-2">
               <label class="sr-only" for="filter-tag">Tag</label>
               <select id="filter-tag"
                       class="select select-sm select-bordered blog-control blog-select blog-select--tag"
@@ -185,9 +153,10 @@
             </button>
           </div>
 
-          <!-- Right: Status -->
-          <div class="blog-toolbar-right">
-            <span id="filter-status" class="inline-flex items-center rounded-full border border-base-300/40 px-4 py-2 bg-base-100 text-sm opacity-75">
+          <!-- Right: status -->
+          <div class="flex justify-start lg:justify-end">
+            <span id="filter-status"
+                  class="inline-flex items-center rounded-full border border-base-300/40 px-4 py-2 bg-base-100 text-sm opacity-75">
               Showing all posts
             </span>
           </div>
@@ -197,7 +166,7 @@
     </section>
 
     <!-- Posts -->
-    <div class="mt-10" id="blog-list" aria-label="Posts by year">
+    <div class="mt-8" id="blog-list" aria-label="Posts by year">
       {% for spath in years %}
         {% set ysec = get_section(path=spath) %}
         {% set posts = ysec.pages | sort(attribute="date") | reverse %}
@@ -223,7 +192,7 @@
                 {% endif %}
 
                 <a href="{{ p.permalink }}"
-                   class="blog-item block rounded-3xl border border-base-300/40 bg-base-100 hover:shadow-sm transition focus:outline-none focus:ring focus:ring-primary/30"
+                   class="blog-item blog-item-link block border border-base-300/40 bg-base-100 hover:shadow-sm transition focus:outline-none focus:ring focus:ring-primary/30"
                    data-year="{{ ysec.title }}"
                    data-category="{{ category }}"
                    data-tags="{{ tags_csv | lower }}"
@@ -280,7 +249,7 @@
       {% endfor %}
     </div>
 
-    <!-- Filter logic -->
+    <!-- Filters JS -->
     <script>
       (function () {
         const cat = document.getElementById("filter-category");
