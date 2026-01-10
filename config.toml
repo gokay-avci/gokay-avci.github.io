@@ -1,38 +1,96 @@
+# ============================
+# Core site settings
+# ============================
 base_url = "https://gokay-avci.github.io"
 title = "Avci Lab"
 description = "Computational Materials Science Personal Website"
 default_language = "en"
 theme = "daisy"
+
+# Build behaviour
 build_search_index = true
 generate_feeds = true
+# feed_filenames = ["atom.xml"]          # default
+# feed_filenames = ["atom.xml", "rss.xml"]  # enable both if you want
 
+# Nice-to-have build flags (optional)
+minify_html = true
+# output_dir = "public"                 # default
+# compile_sass = false                  # enable if you add /sass
+# hard_link_static = false              # useful for huge static assets on same FS
+# ignored_content = ["*.{graphml,xlsx}", "**/tmp/**"]
+# ignored_static  = ["**/.DS_Store"]
+
+# ============================
+# Taxonomies
+# ============================
 taxonomies = [
-  { name = "tags", paginate_by = 10, feed = true },
-  { name = "categories", paginate_by = 10, feed = true },
+  { name = "tags", paginate_by = 8, feed = true },
+  { name = "categories", paginate_by = 8, feed = true },
 ]
 
+# Optional: put taxonomies under /journal/... instead of /tags/... /categories/...
+# taxonomy_root = "journal"
+
+# ============================
+# Markdown rendering
+# ============================
 [markdown]
 render_emoji = true
 
-[markdown.highlighting]
-error_on_missing_language = false
-style = "inline"
-theme = "github-dark"
-# If you prefer light/dark highlighting instead of a single theme, use:
-# light_theme = "github-light"
-# dark_theme = "github-dark"
+# External links controls (optional)
+# external_links_target_blank = true
+# external_links_no_follow = true
+# external_links_no_referrer = true
+# external_links_external = true
+# external_links_class = "external"
 
+# Typography / markdown features (optional)
+# smart_punctuation = true
+# definition_list = true
+# bottom_footnotes = true
+# lazy_async_image = true
+# insert_anchor_links = "heading"   # or "left" / "right" depending on preference
+# github_alerts = true
+
+# --- Syntax highlighting (Zola 0.22 uses Giallo) ---
+[markdown.highlighting]
+# Rendering style:
+# - "inline": simplest; uses inline styles (and light-dark() if dual themes)
+# - "class": generates CSS files (giallo*.css) for you to include
+style = "inline"
+
+# Choose ONE:
+#theme = "github-dark"
+# OR dual themes:
+ light_theme = "github-light"
+ dark_theme  = "github-dark"
+
+error_on_missing_language = false
+
+# Advanced: add extra grammars/themes (paths relative to site root)
+# extra_grammars = ["syntaxes/some.sublime-syntax"]
+# extra_themes = ["syntaxes/some-theme.json"]
+
+# ============================
+# Search
+# ============================
 [search]
 index_format = "elasticlunr_json"
 include_title = true
 include_content = true
+# include_description = true
+# truncate_content_length = 180
 
+# ============================
+# Theme / site extras (daisy)
+# ============================
 [extra]
 github = "gokay-avci"
 twitter = "---"
 email = "gavci@u.lab"
 
-enable_theme_switching = false
+enable_theme_switching = true
 theme_toggle = true
 daisyui_theme_light = "Emerald"
 daisyui_theme_dark = "Forest"
@@ -47,11 +105,26 @@ daisyui_themes = [
 
 [extra.navbar]
 links = [
-  { url = "about", i18n_key = "nav_about" },
+  { url = "about",    i18n_key = "nav_about" },
   { url = "projects", i18n_key = "nav_projects" },
-  { url = "blog", i18n_key = "nav_journal" },
-  { url = "CV", i18n_key = "nav_CV" },
+  { url = "blog",     i18n_key = "nav_journal" },
+  { url = "CV",       i18n_key = "nav_CV" },
 ]
 
 [extra.footer]
 notice = "• Built with :heart: by @Gokay Avci 2026 •"
+
+# ============================
+# Advanced (optional): link checker / slugs
+# ============================
+
+# [link_checker]
+# skip_prefixes = ["http://localhost"]
+# skip_anchor_prefixes = ["mailto:"]
+# internal_level = "warn"     # "error" / "warn" / "off"
+# external_level = "warn"     # external checks can slow CI
+
+# [slugify]
+# paths = "on"
+# taxonomies = "on"
+# anchors = "on"
