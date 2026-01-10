@@ -7,15 +7,20 @@ build_search_index = true
 generate_feeds = true
 
 taxonomies = [
-  { name = "tags", paginate_by = 10, rss = true },
-  { name = "categories", paginate_by = 10, rss = true },
+  { name = "tags", paginate_by = 10, feed = true },
+  { name = "categories", paginate_by = 10, feed = true },
 ]
 
 [markdown]
 render_emoji = true
 
 [markdown.highlighting]
-enable = true
+error_on_missing_language = false
+style = "inline"
+theme = "github-dark"
+# If you prefer light/dark highlighting instead of a single theme, use:
+# light_theme = "github-light"
+# dark_theme = "github-dark"
 
 [search]
 index_format = "elasticlunr_json"
