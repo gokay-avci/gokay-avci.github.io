@@ -78,7 +78,7 @@ error_on_missing_language = false
 [search]
 index_format = "elasticlunr_json"
 include_title = true
-include_content = true
+include_content = false
 # include_description = true
 # truncate_content_length = 180
 
@@ -94,8 +94,10 @@ email = "gavci@u.lab"
 enable_theme_switching = true
 
 # defaults (use lowercase theme identifiers)
-daisyui_theme_light = "emerald"
-daisyui_theme_dark = "forest"
+#daisyui_theme_light = "emerald"
+#daisyui_theme_dark = "forest"
+
+default_theme = "corporate"
 
 # Optional: only needed if the theme expects a list from config for the dropdown
 daisyui_themes = [

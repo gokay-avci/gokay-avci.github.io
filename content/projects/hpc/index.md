@@ -9,8 +9,8 @@ tags = ["HPC", "Rust", "Systems"]
 categories = ["Projects"]
 
 [extra]
-cover = "projects/hpc.jpg"
-cover_alt = "Fitness landscape visualisation"
+cover = "hpc.jpg"
+cover_alt = "Fault-tolerant orchestration dashboard"
 +++
 
 **Status**: Beta | **Stack**: Rust, Tokio, SQLite

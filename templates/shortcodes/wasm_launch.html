@@ -1,0 +1,73 @@
+{% set demo_path = demo_path | default(value="demos/porosity_lab/index.html") %}
+{% set height = height | default(value="560") %}
+{% set id = id | default(value="wasm_demo") %}
+
+<div class="rounded-3xl border border-base-300/50 bg-base-100 shadow-sm p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <h3 class="text-lg font-semibold">{{ title | default(value="Interactive demo") }}</h3>
+      {% if description %}
+        <p class="mt-1 opacity-75">{{ description }}</p>
+      {% endif %}
+    </div>
+
+    <button
+      class="btn btn-sm btn-primary rounded-full"
+      type="button"
+      data-wasm-btn="{{ id }}"
+      data-wasm-src="{{ get_url(path=demo_path) }}"
+    >
+      Launch demo
+    </button>
+  </div>
+
+  <div class="mt-4 hidden" id="{{ id }}_wrap">
+    <iframe
+      id="{{ id }}"
+      class="w-full rounded-2xl border border-base-300/50 bg-base-100"
+      style="height: {{ height }}px;"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin"
+      referrerpolicy="no-referrer"
+    ></iframe>
+  </div>
+
+  <p class="mt-3 text-sm opacity-70" id="{{ id }}_hint">
+    This demo loads only after you click <span class="font-semibold">Launch demo</span>.
+  </p>
+</div>
+
+<script>
+(function(){
+  if (window.__wasmLaunchInstalled) return;
+  window.__wasmLaunchInstalled = true;
+
+  document.addEventListener("click", function(e){
+    const btn = e.target.closest("[data-wasm-btn]");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-wasm-btn");
+    const src = btn.getAttribute("data-wasm-src");
+
+    const wrap = document.getElementById(id + "_wrap");
+    const iframe = document.getElementById(id);
+    const hint = document.getElementById(id + "_hint");
+
+    if (!wrap || !iframe) return;
+
+    wrap.classList.remove("hidden");
+    if (hint) hint.classList.add("hidden");
+
+    if (iframe.getAttribute("src")) return;
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    requestAnimationFrame(() => {
+      iframe.setAttribute("src", src);
+      btn.classList.remove("loading");
+      btn.textContent = "Loaded";
+    });
+  });
+})();
+</script>

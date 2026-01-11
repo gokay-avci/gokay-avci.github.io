@@ -1,0 +1,14 @@
+{# Returns the correct URL for page-bundle covers (Option A).
+   - cover="hpc.jpg"  -> page.permalink + "hpc.jpg"
+   - cover="/img/x.jpg" or https://... -> used as-is
+#}
+{% macro src(page) -%}
+  {%- if page.extra is defined and page.extra.cover is defined and page.extra.cover -%}
+    {%- set c = page.extra.cover -%}
+    {%- if c is starting_with("/") or c is starting_with("http://") or c is starting_with("https://") -%}
+      {{- c -}}
+    {%- else -%}
+      {{- page.permalink ~ c -}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro src %}

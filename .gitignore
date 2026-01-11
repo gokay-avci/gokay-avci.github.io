@@ -1,15 +1,86 @@
-# Zola build output
-/public/
-
-# Wasm / Rust build artifacts
-/demos/*/target/
-/demos/*/pkg/
-*.wasm
-
-# macOS system files
+############################################
+# OS / Editor / Misc
+############################################
 .DS_Store
-.AppleDouble
-.LSOverride
+Thumbs.db
+*~
+*.swp
+*.swo
+*.tmp
+.cache/
+.vscode/
+.idea/
+*.code-workspace
 
-# Editor and temporary files
-*.save
+############################################
+# Obsidian vault noise (if blog is a vault)
+############################################
+.obsidian/
+.trash/
+.DS_Store
+
+############################################
+# Zola outputs / caches
+############################################
+public/
+.zola/
+.zola-cache/
+# If you ever generate additional build dirs
+build/
+dist/
+
+############################################
+# Rust / Cargo / Trunk
+############################################
+# Build artifacts
+**/target/
+**/*.rlib
+**/*.rmeta
+**/*.pdb
+**/*.dSYM/
+
+# Trunk default dist (if used)
+**/dist/
+
+# wasm-bindgen / wasm artifacts (generated)
+**/pkg/
+**/wasm-bindgen/
+**/*.wasm
+**/*.wat
+**/*.js.map
+
+############################################
+# IMPORTANT: Demo build output
+# Let CI build and deploy these. Keep them OUT of git to avoid stale churn.
+############################################
+static/demos/
+static/demos/**
+
+############################################
+# Node (only if you use npm/yarn/pnpm anywhere)
+############################################
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+############################################
+# Python (if any scripts)
+############################################
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.mypy_cache/
+.pytest_cache/
+
+############################################
+# Optional: ignore local theme tooling artefacts (rare)
+############################################
+themes/**/.sass-cache/
+themes/**/node_modules/
+themes/**/dist/
+themes/**/public/

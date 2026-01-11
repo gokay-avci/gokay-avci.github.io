@@ -16,4 +16,5 @@ cover_alt = "Fitness landscape visualisation"
 
 A zero-install, browser-based tool that calculates geometric porosity.
 
-[Launch Demo](/lab/porosity-lab/)
+[Launch demo](/lab/porosity-lab/)
+[Open fullscreen](/demos/porosity_lab/index.html)

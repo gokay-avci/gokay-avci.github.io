@@ -1,128 +1,163 @@
-{% extends "daisy/templates/base.html" %}
+{% extends "base.html" %}
 
 {% block extra_headers %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ get_url(path='landing.css') }}">
+  <link rel="stylesheet" href="{{ get_url(path='css/home.css') }}">
 {% endblock extra_headers %}
 
 {% block content %}
-<div class="landing">
-  <main class="landing-wrap">
+<div class="home">
 
-    <!-- HERO -->
-    <section class="landing-hero">
-      <div class="landing-portrait">
-        <div class="avatar">
-          <div class="w-24 md:w-28 rounded-full ring ring-neutral/20 ring-offset-base-100 ring-offset-4">
-            <img src="{{ get_url(path='img/me.jpg') }}" alt="Portrait photo of me" loading="lazy" />
+  <!-- HERO -->
+  <section class="home-hero">
+    <div class="home-hero-card">
+      <div class="home-hero-left">
+        <div class="home-avatar">
+          <img src="{{ get_url(path='img/me.jpg') }}" alt="Portrait photo of Gokay Avci" loading="eager" decoding="async">
+        </div>
+
+        <div class="home-hero-copy">
+          <div class="home-kicker">Computational Matter</div>
+          <h1 class="home-title">Gokay Avci</h1>
+
+          <p class="home-lead">
+            Computational materials scientist pivoting into systems engineering — building reproducible, HPC-ready pipelines for porous
+            molecular materials, and robust scientific tooling in Rust/WASM.
+          </p>
+
+          <p class="home-sub">
+            Porous materials • host–guest chemistry • workflow orchestration • simulation→ML acceleration • GPU-first visualisation
+          </p>
+
+          <div class="home-invite">
+            <span class="home-muted">If you’re new:</span>
+            <span class="home-chip">start with the recent work below</span>
           </div>
         </div>
       </div>
 
-      <div class="landing-copy">
-        <p class="landing-kicker">Welcome</p>
-        <h1 class="landing-title">Gokay Avci</h1>
+      <aside class="home-hero-right" aria-label="Research pillars">
+        <div class="home-pillbox">
+          <div class="home-pill">
+            <div class="home-dot home-dot-primary"></div>
+            <div>
+              <div class="home-pill-title">Microstructure</div>
+              <div class="home-pill-text">How disorder self-organises into pattern (and how we model it).</div>
+            </div>
+          </div>
 
-        <p class="landing-lead">
-          I’m a computational materials scientist pivoting into systems engineering — building reproducible, HPC-ready pipelines for
-          porous molecular materials, and robust scientific tooling in Rust/WASM.
-        </p>
+          <div class="home-pill">
+            <div class="home-dot home-dot-secondary"></div>
+            <div>
+              <div class="home-pill-title">High-performance web</div>
+              <div class="home-pill-text">Rust/WASM + GPU-first visualisation to make science interactive.</div>
+            </div>
+          </div>
 
-        <p class="landing-sub">
-          Porous materials • host–guest chemistry • workflow orchestration • simulation→ML acceleration • GPU-first visualisation
-        </p>
+          <div class="home-pill">
+            <div class="home-dot home-dot-accent"></div>
+            <div>
+              <div class="home-pill-title">Reproducibility</div>
+              <div class="home-pill-text">Lab-as-code workflows: traceability, caching, deterministic runs.</div>
+            </div>
+          </div>
 
-        <div class="landing-invite">
-          <span class="landing-muted">If you’re new:</span>
-          <span class="landing-chip">start with the recent projects below</span>
+          <div class="home-badges">
+            <span class="home-badge">Rust</span>
+            <span class="home-badge">WASM</span>
+            <span class="home-badge">HPC</span>
+            <span class="home-badge">Tokio</span>
+            <span class="home-badge">SQLite</span>
+            <span class="home-badge">WGPU</span>
+          </div>
         </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- RECENT WORK -->
+  <section class="home-section">
+    <div class="home-section-head">
+      <div>
+        <h2 class="home-h2">Recent work</h2>
+        <p class="home-muted">Curated highlights — fast to scan, easy to open.</p>
       </div>
-    </section>
+      <a class="home-btn" href="/projects/">Browse projects</a>
+    </div>
 
-    <div class="landing-rule"></div>
+    {% set projects = get_section(path="projects/_index.md") %}
 
-    <!-- RECENT PROJECTS -->
-    <section class="landing-section">
-      <div class="landing-section-head">
-        <h2 class="landing-h2">Recent projects</h2>
-        <p class="landing-muted">A small, curated selection for first-time visitors.</p>
-      </div>
+    {% if projects.pages | length > 0 %}
+      <div class="home-grid">
+        {% for p in projects.pages | slice(end=4) %}
 
-      {% set projects = get_section(path="projects/_index.md") %}
+          {% set cover = "" %}
+          {% if p.extra is defined and p.extra.cover is defined and p.extra.cover %}
+            {% set cover = p.extra.cover %}
+          {% endif %}
 
-      {% if projects.pages | length > 0 %}
-        <div class="landing-grid">
-          {% for p in projects.pages | slice(end=4) %}
-            <article class="landing-card">
+          {% set cover_url = "" %}
+          {% if cover and cover | length > 0 %}
+            {% if cover is starting_with("/") or cover is starting_with("http://") or cover is starting_with("https://") %}
+              {% set cover_url = cover %}
+            {% else %}
+              {# Option A: bundle asset next to index.md -> /projects/<slug>/<file> #}
+              {% set cover_url = p.permalink ~ cover %}
+            {% endif %}
+          {% endif %}
 
-              {% set cover = "" %}
-              {% if p.extra is defined and p.extra.cover is defined %}
-                {% if p.extra.cover is iterable and p.extra.cover is not string %}
-                  {% set cover = p.extra.cover | first %}
-                {% else %}
-                  {% set cover = p.extra.cover %}
-                {% endif %}
-              {% endif %}
+          <article class="home-card">
+            {% if cover_url and cover_url | length > 0 %}
+              <a class="home-card-media" href="{{ p.permalink }}" aria-label="Open: {{ p.title }}">
+                <img
+                  src="{{ cover_url }}"
+                  alt="{{ p.extra.cover_alt | default(value=p.title) }}"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </a>
+            {% endif %}
 
-              {% if cover and cover | length > 0 %}
-                <a class="landing-card-media" href="{{ p.permalink }}" aria-label="Open project: {{ p.title }}">
-                  <img
-                    src="{{ get_url(path=cover) }}"
-                    alt="{% if p.extra is defined and p.extra.cover_alt is defined %}{{ p.extra.cover_alt }}{% else %}{{ p.title }}{% endif %}"
-                    loading="lazy"
-                  />
-                </a>
-              {% endif %}
+            <div class="home-card-body">
+              <div class="home-card-top">
+                <h3 class="home-h3">
+                  <a href="{{ p.permalink }}">{{ p.title }}</a>
+                </h3>
 
-              <div class="landing-card-body">
-                <div class="landing-card-top">
-                  <h3 class="landing-h3">
-                    <a href="{{ p.permalink }}" class="landing-link">{{ p.title }}</a>
-                  </h3>
-
-                  {% if p.date %}
-                    <div class="landing-date">
-  {{ p.date | date(format=i18n_user['language_date_format'] | default(value=i18n['language_date_format']),
-                   locale=i18n_user['language_locale'] | default(value=i18n['language_locale'])) }}
-					</div>
-                  {% endif %}
-                </div>
-
-                {% if p.description %}
-                  <p class="landing-desc">{{ p.description }}</p>
-                {% elif p.summary %}
-                  <p class="landing-desc">{{ p.summary | striptags | truncate(length=160) }}</p>
-                {% else %}
-                  <p class="landing-desc">A project note and implementation details.</p>
-                {% endif %}
-
-                {% if p.taxonomies and p.taxonomies.tags %}
-                  <div class="landing-tags">
-                    {% for t in p.taxonomies.tags | slice(end=3) %}
-                      <span class="badge badge-outline">{{ t }}</span>
-                    {% endfor %}
+                {% if p.date %}
+                  <div class="home-date">
+                    {{ p.date | date(
+                      format=i18n_user['language_date_format'] | default(value=i18n['language_date_format']),
+                      locale=i18n_user['language_locale'] | default(value=i18n['language_locale'])
+                    ) }}
                   </div>
                 {% endif %}
               </div>
 
-            </article>
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="landing-empty">
-          <p class="landing-muted">
-            No projects found yet. Add pages under <code>content/projects/</code> and ensure <code>content/projects/_index.md</code> exists.
-          </p>
-        </div>
-      {% endif %}
-    </section>
+              {% if p.description %}
+                <p class="home-desc">{{ p.description }}</p>
+              {% elif p.summary %}
+                <p class="home-desc">{{ p.summary | striptags | truncate(length=160) }}</p>
+              {% endif %}
 
-    <section class="landing-foot">
-      <p class="landing-muted">
-        The home page is intentionally quiet; navigation and sections do the heavy lifting.
-      </p>
-    </section>
+              {% if p.taxonomies and p.taxonomies.tags %}
+                <div class="home-tags">
+                  {% for t in p.taxonomies.tags | slice(end=4) %}
+                    <span class="home-tag">{{ t }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </article>
 
-  </main>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="home-empty">
+        No projects found yet. Add pages under <code>content/projects/</code> and ensure <code>content/projects/_index.md</code> exists.
+      </div>
+    {% endif %}
+  </section>
+
 </div>
 {% endblock content %}

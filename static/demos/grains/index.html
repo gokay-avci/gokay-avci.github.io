@@ -1,7 +1,19 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><title>Grain Growth</title>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Porosity Lab</title>
+
+    <!-- Critical for GitHub Pages + nested hosting + iframes -->
+    <base href="/demos/porosity_lab/" />
+
+    <!-- Trunk entry -->
+    
 <script type="module">
-import init, * as bindings from '/demos/grains/grains-253c4935afff3914.js';
-const wasm = await init({ module_or_path: '/demos/grains/grains-253c4935afff3914_bg.wasm' });
+import init, * as bindings from '/demos/porosity_lab/porosity_lab-e14f7f6074caf289.js';
+const wasm = await init({ module_or_path: '/demos/porosity_lab/porosity_lab-e14f7f6074caf289_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -9,4 +21,265 @@ window.wasmBindings = bindings;
 
 dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
-</script><style>body{margin:0;background:transparent;font-family:sans-serif;overflow:hidden;}canvas{display:block;width:100vw;height:100vh;}#ui{position:absolute;top:20px;left:20px;background:rgba(0,0,0,0.85);padding:15px;border:1px solid #444;border-radius:8px;width:220px;color:#ddd;}h1{margin:0 0 10px 0;font-size:14px;color:#aaa;}button{width:100%;padding:8px;background:#666;border:none;font-weight:bold;cursor:pointer;border-radius:4px;color:white;}button:hover{opacity:0.9;}</style><link rel="modulepreload" href="/demos/grains/grains-253c4935afff3914.js" crossorigin="anonymous" integrity="sha384-D5Pv4zTqnAdV+9+qH2SqsR2+EjqK8pliOSZ0RskyoKovnrPXnkk9tjoygHDqcyf7"><link rel="preload" href="/demos/grains/grains-253c4935afff3914_bg.wasm" crossorigin="anonymous" integrity="sha384-duP7eT60a4K6t1jUCpWknCGltOHBPGyeImiK6Agk/HYipXDyy/AtcThBj6QP9SeG" as="fetch" type="application/wasm"></head><body><canvas id="canvas"></canvas><div id="ui"><h1>MICROSTRUCTURE</h1><button id="reset">QUENCH (RESET)</button></div></body></html>
+</script>
+
+    <style>
+      :root{
+        --bg: transparent;
+        --panel-bg: rgba(12,12,14,0.92);
+        --panel-border: rgba(255,255,255,0.12);
+        --text: rgba(255,255,255,0.92);
+        --muted: rgba(255,255,255,0.62);
+        --ring: rgba(255,255,255,0.14);
+        --btn-bg: rgba(255,255,255,0.12);
+        --btn-bg-hover: rgba(255,255,255,0.18);
+        --chip: rgba(255,255,255,0.09);
+        --track: rgba(255,255,255,0.10);
+      }
+      html,body{
+        height:100%;
+        margin:0;
+        overflow:hidden;
+        background:var(--bg);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans",
+          "Apple Color Emoji","Segoe UI Emoji";
+      }
+
+      #app{
+        width:100vw;
+        height:100vh;
+        position:relative;
+        overflow:hidden;
+        touch-action:none;
+      }
+
+      /* Canvas: crisp and full size */
+      #canvas{
+        display:block;
+        width:100%;
+        height:100%;
+        touch-action:none;
+      }
+
+      /* Top-left overlay panel */
+      #ui{
+        position:absolute;
+        top:14px;
+        left:14px;
+        right:14px;
+        max-width:540px;
+        padding:14px;
+        border-radius:18px;
+        border:1px solid var(--panel-border);
+        background:var(--panel-bg);
+        color:var(--text);
+        box-shadow:0 10px 30px rgba(0,0,0,0.35);
+      }
+      .title{
+        display:flex;
+        align-items:baseline;
+        justify-content:space-between;
+        gap:12px;
+      }
+      h1{
+        margin:0;
+        font-size:12px;
+        letter-spacing:0.14em;
+        text-transform:uppercase;
+        color:var(--muted);
+      }
+      .meta{
+        font-size:12px;
+        color:var(--muted);
+        white-space:nowrap;
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap:10px;
+        margin-top:12px;
+      }
+      .metric{
+        border:1px solid var(--panel-border);
+        border-radius:14px;
+        padding:10px;
+        background:rgba(255,255,255,0.04);
+      }
+      .metric .k{
+        font-size:11px;
+        color:var(--muted);
+        letter-spacing:0.08em;
+        text-transform:uppercase;
+      }
+      .metric .v{
+        margin-top:4px;
+        font-size:18px;
+        font-weight:800;
+      }
+
+      .controls{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:10px;
+        margin-top:12px;
+      }
+      .card{
+        border:1px solid var(--panel-border);
+        border-radius:14px;
+        padding:10px;
+        background:rgba(255,255,255,0.04);
+      }
+      .row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+      }
+      .label{
+        font-size:12px;
+        color:var(--muted);
+      }
+      .chip{
+        font-size:12px;
+        padding:4px 10px;
+        border-radius:999px;
+        background:var(--chip);
+        border:1px solid var(--panel-border);
+        color:var(--text);
+        font-variant-numeric: tabular-nums;
+      }
+
+      input[type="range"]{
+        width:100%;
+        margin-top:10px;
+        accent-color: rgba(255,255,255,0.72);
+      }
+      /* make slider track a bit more visible */
+      input[type="range"]::-webkit-slider-runnable-track { background: var(--track); height: 6px; border-radius: 999px; }
+      input[type="range"]::-moz-range-track { background: var(--track); height: 6px; border-radius: 999px; }
+
+      .actions{
+        display:grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap:10px;
+        margin-top:12px;
+      }
+      button{
+        padding:10px 12px;
+        border-radius:999px;
+        border:1px solid var(--ring);
+        background:var(--btn-bg);
+        color:var(--text);
+        font-weight:800;
+        cursor:pointer;
+      }
+      button:hover{ background: var(--btn-bg-hover); }
+      button:active{ transform: translateY(1px); }
+
+      /* Loader */
+      #loader{
+        position:absolute;
+        inset:0;
+        display:grid;
+        place-items:center;
+        pointer-events:none;
+        background:rgba(0,0,0,0.18);
+        color:rgba(255,255,255,0.86);
+        font-size:14px;
+      }
+      .loader-inline{
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        padding:10px 14px;
+        border-radius:999px;
+        border:1px solid rgba(255,255,255,0.12);
+        background: rgba(12,12,14,0.72);
+      }
+      .spinner{
+        width:18px;height:18px;border-radius:999px;
+        border:2px solid rgba(255,255,255,0.25);
+        border-top-color: rgba(255,255,255,0.75);
+        animation: spin 900ms linear infinite;
+      }
+      @keyframes spin{ to{ transform: rotate(360deg);} }
+      html[data-wasm-ready="1"] #loader{ display:none; }
+
+      @media (max-width: 560px){
+        #ui{ max-width:none; }
+        .grid{ grid-template-columns: 1fr; }
+        .controls{ grid-template-columns: 1fr; }
+        .actions{ grid-template-columns: 1fr; }
+      }
+    </style>
+
+    <script>
+      window.setWasmReady = function () {
+        document.documentElement.dataset.wasmReady = "1";
+      };
+      window.addEventListener("wasm:ready", () => window.setWasmReady());
+      // safety fallback
+      setTimeout(() => window.setWasmReady(), 10000);
+    </script>
+  <link rel="modulepreload" href="/demos/porosity_lab/porosity_lab-e14f7f6074caf289.js" crossorigin="anonymous" integrity="sha384-NXF/n2lRI7CV1pr10O7eviT/M9YsEMYOv3BLdBWwqNA76Etd6EJCvuey2sDcMURd"><link rel="preload" href="/demos/porosity_lab/porosity_lab-e14f7f6074caf289_bg.wasm" crossorigin="anonymous" integrity="sha384-4r7lLB9pWJ+oXZDD4V6NClo1AAVelCMlyOgXi+F/nfdytNDlw+CPCDH7o1wECjHN" as="fetch" type="application/wasm"></head>
+
+  <body>
+    <main id="app">
+      <canvas id="canvas" aria-label="Porosity lab canvas"></canvas>
+
+      <div id="ui" role="group" aria-label="Porosity lab controls">
+        <div class="title">
+          <h1>Porosity Lab</h1>
+          <div class="meta">Rust · WASM · Trunk</div>
+        </div>
+
+        <div class="grid" aria-label="Metrics">
+          <div class="metric">
+            <div class="k">Total void</div>
+            <div class="v" id="stat-total">–</div>
+          </div>
+          <div class="metric">
+            <div class="k">Accessible</div>
+            <div class="v" id="stat-access">–</div>
+          </div>
+          <div class="metric">
+            <div class="k">Isolated</div>
+            <div class="v" id="stat-iso">–</div>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="Controls">
+          <div class="card">
+            <div class="row">
+              <div class="label">Target porosity</div>
+              <div class="chip"><span id="val-p">0.40</span></div>
+            </div>
+            <input id="input-p" type="range" min="0.05" max="0.85" step="0.01" value="0.40" />
+          </div>
+
+          <div class="card">
+            <div class="row">
+              <div class="label">Correlation scale</div>
+              <div class="chip"><span id="val-s">20</span> px</div>
+            </div>
+            <input id="input-s" type="range" min="4" max="64" step="1" value="20" />
+          </div>
+        </div>
+
+        <div class="actions" aria-label="Actions">
+          <button id="regen" type="button">Regenerate</button>
+          <button id="btn-reset" type="button">Reset</button>
+          <button id="btn-snapshot" type="button">Snapshot</button>
+        </div>
+      </div>
+
+      <div id="loader" aria-live="polite">
+        <div class="loader-inline">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Loading lab…</span>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

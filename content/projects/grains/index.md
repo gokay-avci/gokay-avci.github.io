@@ -8,4 +8,5 @@ toc = true
 +++
 Simulating the evolution of crystal grains in a metal during annealing.
 
-{{ wasm_embed(path="demos/grains/index.html", title="Microstructure Evolution") }}
+
+[Open fullscreen](/demos/grains/index.html)

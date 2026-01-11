@@ -2,3 +2,4 @@
 target = "index.html"
 dist = "../../static/demos/porosity_lab"
 public_url = "/demos/porosity_lab/"
+filehash = true

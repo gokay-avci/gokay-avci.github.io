@@ -1,6 +1,5 @@
 +++
 title = "Projects"
-template = "section.html"
-sort_by = "weight"
+sort_by = "date"
+paginate_by = 12
 +++
-**Selected Works & Experiments.**

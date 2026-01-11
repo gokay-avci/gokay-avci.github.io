@@ -1,7 +1,7 @@
 nav_about = "About"
-nav_lab = "Laboratory"
 nav_journal = "Journal"
 nav_CV = "CV"
 nav_projects ="Projects"
 language_date_format = "%d %B %Y"
 language_locale = "en_GB"
+nav_work = "Work"
