@@ -1,30 +1,209 @@
-<!-- Load Libs safely -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+{# ------------------------------------------------------------------
+   mol3d shortcode (ultimate)
+   Usage: {{ mol3d(id="mol1", pdb="4HHB") }}
+   Optional: style="cartoon|stick|sphere", height=420, bg="black|transparent"
+------------------------------------------------------------------- #}
 
-<div class="mol-wrapper" id="mol-{{ id }}"></div>
-<div style="text-align:center; font-size:0.8rem; opacity:0.7; margin-bottom: 2rem;">
-    <strong>Interaction:</strong> Left-Click Rotate | Scroll Zoom | Right-Click Pan
+{% set _id = id | default(value="mol") %}
+{% set _pdb = pdb %}
+{% set _style = style | default(value="cartoon") %}
+{% set _height = height | default(value=420) %}
+{% set _bg = bg | default(value="black") %}
+
+<div class="mol3d-block">
+  <div
+    id="mol-{{ _id }}"
+    class="mol3d-viewer"
+    data-pdb="{{ _pdb }}"
+    data-style="{{ _style }}"
+    data-bg="{{ _bg }}"
+    style="height: {{ _height }}px;"
+    role="img"
+    aria-label="3D molecular viewer for PDB {{ _pdb }}"
+  >
+    <div class="mol3d-overlay" aria-live="polite">
+      <div class="mol3d-spinner" aria-hidden="true"></div>
+      <div class="mol3d-overlay-text">
+        <div class="mol3d-title">Loading 3D viewer</div>
+        <div class="mol3d-sub">PDB: {{ _pdb }} · starts when visible</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mol3d-hint">
+    <strong>Interaction:</strong> Drag rotate · Scroll zoom · Right-drag pan
+  </div>
 </div>
 
 <script>
-    $(document).ready(function() {
-        let element = $("#mol-{{ id }}");
-        // Ensure height is computed before render
-        element.height(400); 
-        
-        let config = { backgroundColor: "black" };
-        let viewer = $3Dmol.createViewer(element, config);
-        
-        $3Dmol.download("pdb:{{ pdb }}", viewer, {multimodel:true, frames:true}, function() {
-            viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
-            viewer.zoomTo();
-            viewer.render();
-            // Subtle rotation animation
-            let angle = 0;
-            setInterval(function(){
-                // user interaction stops auto-rotate usually, keeping it simple here
-            }, 50);
-        });
+(function () {
+  // ----------------------------
+  // CSS (insert once)
+  // ----------------------------
+  if (!document.getElementById("mol3d-css")) {
+    const css = document.createElement("style");
+    css.id = "mol3d-css";
+    css.textContent = `
+      .mol3d-block { margin: 1rem 0 2rem; }
+      .mol3d-viewer{
+        width: 100%;
+        border-radius: 1rem;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.10);
+      }
+      @media (max-width: 640px){
+        .mol3d-viewer { height: 320px !important; }
+      }
+      .mol3d-overlay{
+        position:absolute; inset:0;
+        display:flex; align-items:center; justify-content:center;
+        gap: 12px;
+        padding: 16px;
+        background: rgba(0,0,0,0.18);
+        backdrop-filter: blur(8px);
+        color: rgba(255,255,255,0.86);
+        pointer-events: none;
+      }
+      .mol3d-spinner{
+        width: 18px; height: 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(255,255,255,0.25);
+        border-top-color: rgba(255,255,255,0.75);
+        animation: mol3dspin 900ms linear infinite;
+        flex: 0 0 auto;
+      }
+      @keyframes mol3dspin { to { transform: rotate(360deg); } }
+      .mol3d-title{ font-weight: 700; font-size: 14px; }
+      .mol3d-sub{ font-size: 12px; opacity: 0.75; margin-top: 2px; }
+      .mol3d-hint{
+        text-align:center;
+        font-size: 0.85rem;
+        opacity: 0.75;
+        margin-top: 0.75rem;
+      }
+    `;
+    document.head.appendChild(css);
+  }
+
+  // ----------------------------
+  // Load 3Dmol only once/page
+  // ----------------------------
+  function load3DmolOnce() {
+    if (window.$3Dmol) return Promise.resolve();
+
+    // if already loading, reuse the same promise
+    if (window.__mol3dLoading) return window.__mol3dLoading;
+
+    window.__mol3dLoading = new Promise((resolve, reject) => {
+      const tryLocalFirst = true;
+      const localSrc = "/js/3Dmol-min.js";
+      const remoteSrc = "https://3Dmol.csb.pitt.edu/build/3Dmol-min.js";
+
+      function inject(src) {
+        const s = document.createElement("script");
+        s.src = src;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load 3Dmol from " + src));
+        document.head.appendChild(s);
+      }
+
+      if (tryLocalFirst) {
+        const s = document.createElement("script");
+        s.src = localSrc;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => inject(remoteSrc); // fallback
+        document.head.appendChild(s);
+      } else {
+        inject(remoteSrc);
+      }
     });
+
+    return window.__mol3dLoading;
+  }
+
+  // ----------------------------
+  // Viewer init (lazy)
+  // ----------------------------
+  const elId = "mol-{{ _id }}";
+  const el = document.getElementById(elId);
+  if (!el) return;
+
+  // guard against re-init
+  if (el.dataset.mol3dInit === "1") return;
+  el.dataset.mol3dInit = "1";
+
+  async function initViewer() {
+    const pdb = el.dataset.pdb;
+    const style = el.dataset.style || "cartoon";
+    const bg = el.dataset.bg || "black";
+
+    await load3DmolOnce();
+
+    // Create viewer
+    const viewer = window.$3Dmol.createViewer(el, { backgroundColor: bg });
+
+    // Download and render
+    window.$3Dmol.download("pdb:" + pdb, viewer, { multimodel: true, frames: true }, function () {
+      if (style === "stick") {
+        viewer.setStyle({}, { stick: {} });
+      } else if (style === "sphere") {
+        viewer.setStyle({}, { sphere: {} });
+      } else {
+        viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+      }
+
+      viewer.zoomTo();
+      viewer.render();
+      viewer.zoom(1.15, 700);
+
+      // remove overlay
+      const overlay = el.querySelector(".mol3d-overlay");
+      if (overlay) overlay.remove();
+    });
+  }
+
+  function fail(msg) {
+    const overlay = el.querySelector(".mol3d-overlay");
+    if (overlay) {
+      overlay.innerHTML =
+        "<div style='max-width:28rem;text-align:center;padding:12px'>⚠️ " +
+        msg +
+        "<div style='opacity:.8;font-size:12px;margin-top:6px'>Try refreshing, or check console for details.</div></div>";
+    }
+  }
+
+  let started = false;
+  function start() {
+    if (started) return;
+    started = true;
+    initViewer().catch((e) => {
+      console.error(e);
+      fail(e.message || "Failed to load viewer");
+    });
+  }
+
+  // Lazy-load when visible
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            io.disconnect();
+            start();
+            break;
+          }
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    io.observe(el);
+  } else {
+    // fallback
+    setTimeout(start, 250);
+  }
+})();
 </script>

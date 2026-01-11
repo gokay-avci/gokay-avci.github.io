@@ -1,7 +1,17 @@
-<div class="gallery-grid">
+{# Usage: {{ gallery(images=["/img/a.jpg","/img/b.jpg"]) }} #}
+
+<div class="not-prose my-8">
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
     {% for img in images %}
-    <div class="gallery-item">
-        <a href="{{ img }}" target="_blank"><img src="{{ img }}" loading="lazy"></a>
-    </div>
+      <a href="{{ img }}" target="_blank" rel="noopener" class="block">
+        <img
+          src="{{ img }}"
+          loading="lazy"
+          decoding="async"
+          class="aspect-square w-full rounded-box border border-base-300/60 object-cover"
+          alt="Gallery image"
+        />
+      </a>
     {% endfor %}
+  </div>
 </div>

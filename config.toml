@@ -75,12 +75,12 @@ error_on_missing_language = false
 # ============================
 # Search
 # ============================
+#[search]
 [search]
 index_format = "elasticlunr_json"
 include_title = true
 include_content = false
-# include_description = true
-# truncate_content_length = 180
+include_description = true
 
 # ============================
 # Theme / site extras (daisy)
@@ -88,7 +88,7 @@ include_content = false
 [extra]
 github = "gokay-avci"
 twitter = "---"
-email = "gavci@u.lab"
+email = "gokayavcichem@gmail.com"
 
 # IMPORTANT: this enables the theme dropdown in the navbar
 enable_theme_switching = true
@@ -97,14 +97,11 @@ enable_theme_switching = true
 #daisyui_theme_light = "emerald"
 #daisyui_theme_dark = "forest"
 
-default_theme = "corporate"
+default_theme = "coffee"
 
 # Optional: only needed if the theme expects a list from config for the dropdown
 daisyui_themes = [
-  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
-  "synthwave", "retro", "cyberpunk", "valentine", "halloween",
-  "garden", "forest", "aqua", "lofi", "pastel", "fantasy",
-  "wireframe", "black", "luxury", "dracula", "cmyk", "autumn",
+  "light", "dark", "cupcake", "emerald", "corporate", "retro", "cyberpunk", "valentine", "halloween", "forest", "luxury", "dracula", "cmyk", "autumn",
   "business", "acid", "lemonade", "night", "coffee", "winter"
 ]
 
@@ -118,7 +115,7 @@ links = [
 ]
 
 [extra.footer]
-notice = "• Built with :heart: by @Gokay Avci 2026 •"
+notice = "© 2026 Gokay Avci • Built with ♥"
 
 # ============================
 # Advanced (optional): link checker / slugs
@@ -134,3 +131,19 @@ notice = "• Built with :heart: by @Gokay Avci 2026 •"
 # paths = "on"
 # taxonomies = "on"
 # anchors = "on"
+
+
+
+#
+#
+#
+#
+#
+#
+#daisyui_themes = [
+#  "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
+#  "synthwave", "retro", "cyberpunk", "valentine", "halloween",
+#  "garden", "forest", "aqua", "lofi", "pastel", "fantasy",
+#  "wireframe", "black", "luxury", "dracula", "cmyk", "autumn",
+#  "business", "acid", "lemonade", "night", "coffee", "winter"
+#]

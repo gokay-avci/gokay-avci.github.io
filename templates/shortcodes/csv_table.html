@@ -1,12 +1,10 @@
-{# templates/shortcodes/csv_table.html
-   Zola 0.22 compatible.
-
-   Minimal usage (recommended):
-     {{ csv_table() }}
-   Assumes a colocated CSV file named: data.csv
-
-   Optional:
-     {{ csv_table(file="tensile_data.csv", caption="Mechanical properties", limit=25) }}
+{# Zola 0.22 compatible
+   Usage:
+     {{ csv_table() }}                      -> expects page-colocated data.csv
+     {{ csv_table(file="t.csv") }}          -> expects page-colocated t.csv
+     {{ csv_table(path="content/.../x.csv") }} -> explicit absolute path (rare)
+   Options:
+     caption="", limit=0, class="table table-zebra w-full"
 #}
 
 {% set file = file | default(value="data.csv") %}
@@ -14,15 +12,23 @@
 {% set limit = limit | default(value=0) %}
 {% set class = class | default(value="table table-zebra w-full") %}
 
-{# Resolve colocated path #}
-{% set path = page.colocated_path ~ file %}
+{# Resolve data source #}
+{% if path is defined and path | length > 0 %}
+  {% set csv_path = path %}
+{% else %}
+  {% set csv_path = page.colocated_path ~ file %}
+{% endif %}
 
-{# Try loading. If file is missing, Zola will error; so you MUST keep data.csv present for posts that call this shortcode. #}
-{% set csv = load_data(path=path, format="csv") %}
+{% set csv = load_data(path=csv_path, format="csv") %}
 
 {% if csv is not defined or csv.records is not defined or csv.records | length == 0 %}
-  <div class="alert">
-    <span>No rows found in <code>{{ file }}</code> (expected at: <code>{{ path }}</code>).</span>
+  <div class="not-prose alert alert-warning my-5">
+    <div>
+      <div class="font-semibold">No rows found</div>
+      <div class="opacity-80">
+        Expected <code>{{ file }}</code> at <code>{{ csv_path }}</code>.
+      </div>
+    </div>
   </div>
 {% else %}
   {% set total = csv.records | length %}
@@ -32,12 +38,11 @@
     {% set rows = csv.records %}
   {% endif %}
 
-  <div class="overflow-x-auto">
+  <div class="not-prose overflow-x-auto my-5">
     <table class="{{ class }}">
       {% if caption and caption | length > 0 %}
         <caption class="text-left text-sm opacity-70 py-2">{{ caption }}</caption>
       {% endif %}
-
       <thead>
         <tr>
           {% for h in csv.headers %}
@@ -45,7 +50,6 @@
           {% endfor %}
         </tr>
       </thead>
-
       <tbody>
         {% for row in rows %}
           <tr>
@@ -56,11 +60,11 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
 
-  {% if limit and limit > 0 and limit < total %}
-    <p class="mt-2 text-sm opacity-70">
-      Showing {{ limit }} of {{ total }} rows from <code>{{ file }}</code>.
-    </p>
-  {% endif %}
+    {% if limit and limit > 0 and limit < total %}
+      <p class="mt-2 text-sm opacity-70">
+        Showing {{ limit }} of {{ total }} rows.
+      </p>
+    {% endif %}
+  </div>
 {% endif %}

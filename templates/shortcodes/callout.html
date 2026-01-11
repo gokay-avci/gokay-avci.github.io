@@ -1,4 +1,22 @@
-<div class="callout">
-    <span class="callout-title">{{ title | default(value="Note") }}</span>
-    <div class="callout-body">{{ body | markdown | safe }}</div>
+{# Usage:
+   {% callout(kind="info", title="Note") %}...{% end %}
+   kind: info|success|warning|error
+#}
+
+{% set kind = kind | default(value="info") %}
+{% set title = title | default(value="Note") %}
+
+{% set cls = "alert" %}
+{% if kind == "success" %}{% set cls = cls ~ " alert-success" %}{% endif %}
+{% if kind == "warning" %}{% set cls = cls ~ " alert-warning" %}{% endif %}
+{% if kind == "error"   %}{% set cls = cls ~ " alert-error" %}{% endif %}
+{% if kind == "info"    %}{% set cls = cls ~ " alert-info" %}{% endif %}
+
+<div class="not-prose {{ cls }} my-5">
+  <div>
+    <div class="font-semibold">{{ title }}</div>
+    <div class="mt-1 opacity-90">
+      {{ body | markdown | safe }}
+    </div>
+  </div>
 </div>

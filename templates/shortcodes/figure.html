@@ -1,6 +1,21 @@
-<figure style="text-align:center; margin: 2rem 0; background: #1a1a1a; padding: 1rem; border-radius: 8px; border: 1px solid #333;">
-    <img src="{{ src }}" style="max-width:100%; height:auto; background:white; padding:5px; border-radius:4px;" loading="lazy">
-    {% if caption %}
-    <figcaption style="margin-top:0.5rem; font-size:0.9rem; color:#aaa;"><strong>Fig.</strong> {{ caption }}</figcaption>
-    {% endif %}
+{# Usage: {{ figure(src="/projects/porosity/porosity.jpg", caption="...", alt="...") }} #}
+
+{% set alt = alt | default(value=caption | default(value="Figure")) %}
+
+<figure class="not-prose my-8">
+  <div class="rounded-box border border-base-300/60 bg-base-200/40 p-3">
+    <img
+      src="{{ src }}"
+      alt="{{ alt }}"
+      loading="lazy"
+      decoding="async"
+      class="w-full rounded-box"
+    />
+  </div>
+
+  {% if caption %}
+    <figcaption class="mt-2 text-sm opacity-70">
+      <span class="font-semibold">Fig.</span> {{ caption }}
+    </figcaption>
+  {% endif %}
 </figure>
