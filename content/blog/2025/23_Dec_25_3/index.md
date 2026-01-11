@@ -1,13 +1,13 @@
 +++
 title = "Scientific Typesetting with Typst"
-date = 2025-02-10
+date = 2025-01-10
 description = "How to integrate Typst formulas into a Zola site."
 [taxonomies]
-tags = ["Typst", "Tools"]
+tags = ["Blog"]
 categories = ["Journal"]
 +++
 
-**Typst** is a new markup-based typesetting system that is much faster than LaTeX.
+**Here is my first trial** This is a trial to get to render a blog!
 
 ### Example Embed
 {% typst() %}
