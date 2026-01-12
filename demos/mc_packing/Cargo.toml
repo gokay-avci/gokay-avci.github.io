@@ -1,0 +1,43 @@
+[package]
+name = "mc_packing"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+wasm-bindgen = "0.2"
+console_error_panic_hook = "0.1"
+js-sys = "0.3"
+
+rand = { version = "0.8", features = ["small_rng"] }
+rand_chacha = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+
+web-sys = { version = "0.3", features = [
+  "Window",
+  "Document",
+  "Location",
+  "Navigator",
+  "HtmlElement",
+  "HtmlInputElement",
+  "HtmlSelectElement",
+  "HtmlButtonElement",
+  "HtmlAnchorElement",
+  "HtmlCanvasElement",
+  "CanvasRenderingContext2d",
+  "Blob",
+  "Url",
+  "UrlSearchParams",
+  "Event",
+  "MouseEvent",
+  "Navigator",
+  "Clipboard",
+] }

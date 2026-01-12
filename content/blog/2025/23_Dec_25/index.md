@@ -4,7 +4,7 @@ date = 2025-01-10
 description = "How to integrate Typst formulas into a Zola site."
 [taxonomies]
 tags = ["Blog"]
-categories = ["Journal"]
+categories = ["Coding"]
 +++
 
 **Here is my first trial** This is a trial to get to render a blog!

@@ -1,0 +1,4 @@
+[build]
+target = "index.html"
+dist = "../../static/demos/mc_packing"
+public_url = "/demos/mc_packing/"

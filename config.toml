@@ -8,7 +8,11 @@ default_language = "en"
 theme = "daisy"
 
 # Build behaviour
-build_search_index = true
+
+
+#build_search_index = true
+
+
 generate_feeds = true
 # feed_filenames = ["atom.xml"]          # default
 # feed_filenames = ["atom.xml", "rss.xml"]  # enable both if you want
@@ -76,11 +80,11 @@ error_on_missing_language = false
 # Search
 # ============================
 #[search]
-[search]
-index_format = "elasticlunr_json"
-include_title = true
-include_content = false
-include_description = true
+#[search]
+#index_format = "elasticlunr_json"
+#include_title = true
+#include_content = false
+#include_description = true
 
 # ============================
 # Theme / site extras (daisy)
@@ -94,10 +98,10 @@ email = "gokayavcichem@gmail.com"
 enable_theme_switching = true
 
 # defaults (use lowercase theme identifiers)
-#daisyui_theme_light = "emerald"
-#daisyui_theme_dark = "forest"
+daisyui_theme_light = "emerald"
+daisyui_theme_dark = "forest"
 
-default_theme = "coffee"
+default_theme = "cupcake"
 
 # Optional: only needed if the theme expects a list from config for the dropdown
 daisyui_themes = [
@@ -115,7 +119,7 @@ links = [
 ]
 
 [extra.footer]
-notice = "© 2026 Gokay Avci • Built with ♥"
+notice = "Gokay Avci • Built with ♥"
 
 # ============================
 # Advanced (optional): link checker / slugs

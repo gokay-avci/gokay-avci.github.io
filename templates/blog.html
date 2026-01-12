@@ -2,305 +2,648 @@
 
 {% block content %}
 <style>
-  /* ===== Blog landing: sane responsive layout + no duplication ===== */
+  /* =========================================================
+     BLOG — Retro box borders (from your reference) + modern clarity
+     Keep ONLY chip colouring (category) + icons
+     No other files touched
+     ========================================================= */
 
-  /* Year bar: scroll on mobile, wrap on desktop */
+  .blog-wrap { max-width: 78rem; margin: 0 auto; }
+
+  /* Avoid global underline on UI links */
+  .blog-yearpill, .post-link { text-decoration: none !important; }
+  .blog-yearpill:hover, .post-link:hover { text-decoration: none !important; }
+
+  /* ---------- HERO (post-modern retro “poster”) ---------- */
+  .blog-hero {
+    position: relative;
+    border-radius: 2rem;
+    border: 2px solid hsl(var(--bc) / .16);
+    background:
+      radial-gradient(900px 380px at 12% 0%, hsl(var(--p) / .16), transparent 55%),
+      radial-gradient(700px 320px at 88% 10%, hsl(var(--a) / .14), transparent 55%),
+      linear-gradient(180deg, hsl(var(--b1) / .96), hsl(var(--b1) / .82));
+    overflow: hidden;
+    padding: 1.15rem 1.15rem;
+    box-shadow:
+      0 16px 32px rgba(0,0,0,.10),
+      0 2px 0 rgba(0,0,0,.06);
+  }
+  @media (min-width: 1024px) { .blog-hero { padding: 1.55rem 1.95rem; } }
+
+  .blog-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .10;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(0,0,0,.38) 1px, transparent 0),
+      linear-gradient(to bottom, rgba(255,255,255,.12), transparent 35%);
+    background-size: 11px 11px, auto;
+    mix-blend-mode: multiply;
+  }
+  [data-theme*="dark"] .blog-hero::after { opacity: .18; }
+
+  .blog-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    opacity: .78;
+  }
+  .k-dot {
+    width: 10px; height: 10px; border-radius: 9999px;
+    background: hsl(var(--p));
+    box-shadow: 0 0 0 3px hsl(var(--p) / .20);
+  }
+
+  .blog-title {
+    font-size: 2.05rem;
+    line-height: 1.10;
+    font-weight: 950;
+    margin-top: .35rem;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 1024px) { .blog-title { font-size: 2.65rem; } }
+
+  .blog-subtitle {
+    opacity: .86;
+    margin-top: .55rem;
+    max-width: 72ch;
+    font-size: 1.03rem;
+    line-height: 1.58;
+  }
+
+  /* ---------- YEAR BAR ---------- */
   .blog-yearbar {
     display: flex;
-    gap: .5rem;
+    gap: .6rem;
     overflow-x: auto;
-    padding-bottom: .25rem;
+    padding: .55rem .1rem .65rem .1rem;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
   .blog-yearbar::-webkit-scrollbar { display: none; }
   @media (min-width: 1024px) {
-    .blog-yearbar { overflow: visible; flex-wrap: wrap; padding-bottom: 0; }
+    .blog-yearbar { overflow: visible; flex-wrap: wrap; padding: .65rem 0 .8rem 0; }
   }
 
-  /* Sticky only for the small filters bar (mobile/tablet). Desktop = normal flow. */
-  .blog-filters-sticky {
-    position: sticky;
-    top: 5rem;           /* sits under Daisy navbar */
-    z-index: 20;
+  .blog-yearpill {
+    border-radius: 9999px;
+    min-height: 3.1rem;
+    height: 3.1rem;
+    padding-inline: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    border: 2px solid hsl(var(--bc) / .14);
+    background: linear-gradient(180deg, hsl(var(--b1) / .96), hsl(var(--b2) / .55));
+    box-shadow: 0 2px 0 rgba(0,0,0,.05);
+    transition: border-color 140ms ease, transform 140ms ease, filter 140ms ease;
+    white-space: nowrap;
+    font-weight: 950;
   }
-  @media (min-width: 1024px) {
-    .blog-filters-sticky { position: static; top: auto; }
+  .blog-yearpill:hover {
+    transform: translateY(-1px);
+    border-color: hsl(var(--bc) / .24);
+    filter: saturate(1.1);
+  }
+  .blog-yearpill:active { transform: translateY(0px); }
+  .blog-yearpill:focus-visible {
+    outline: 3px solid hsl(var(--p) / .45);
+    outline-offset: 3px;
   }
 
-  /* Anchor offsets so year headings don’t hide under sticky bar */
-  .blog-anchor { scroll-margin-top: 12rem; }
-  @media (min-width: 1024px) { .blog-anchor { scroll-margin-top: 7rem; } }
+  /* ---------- FILTERS (sticky) ---------- */
+  .blog-filters { position: sticky; top: 5.25rem; z-index: 20; margin-top: .55rem; }
+  @media (min-width: 1024px) { .blog-filters { top: 5rem; } }
 
-  /* Desktop toolbar grid: full width, not cramped */
-  .blog-toolbar {
+  .blog-filterpanel {
+    border-radius: 2rem;
+    border: 2px solid hsl(var(--bc) / .12);
+    background: hsl(var(--b1) / .92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 30px rgba(0,0,0,.10);
+    padding: .95rem;
+  }
+  @media (min-width: 1024px) { .blog-filterpanel { padding: 1.05rem 1.25rem; } }
+
+  .blog-filtergrid {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: .8rem;
     align-items: center;
   }
-
-  /* Controls sizing (touch-friendly on mobile; refined on desktop) */
-  .blog-pill { border-radius: 9999px; }
-  .blog-control { border-radius: 9999px; min-height: 2.75rem; height: 2.75rem; }
   @media (min-width: 1024px) {
-    .blog-control { min-height: 2.5rem; height: 2.5rem; }
+    .blog-filtergrid { grid-template-columns: 1.55fr .95fr .95fr auto; gap: .9rem; }
   }
 
-  /* Stable select widths on desktop; full width on mobile */
-  .blog-select { width: 100%; }
-  @media (min-width: 1024px) {
-    .blog-select { width: 16rem; }
-    .blog-select--tag { width: 13rem; }
+  .blog-control { border-radius: 9999px; min-height: 3.05rem; height: 3.05rem; }
+  @media (min-width: 1024px) { .blog-control { min-height: 2.75rem; height: 2.75rem; } }
+
+  .blog-statusrow {
+    margin-top: .7rem;
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .blog-statuspill {
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--bc) / .12);
+    background: linear-gradient(180deg, hsl(var(--b2) / .65), hsl(var(--b2) / .45));
+    padding: .55rem .9rem;
+    font-size: .96rem;
+    opacity: .92;
+    white-space: nowrap;
+    box-shadow: 0 2px 0 rgba(0,0,0,.05);
   }
 
-  /* Icon sizing */
-  .blog-ic { width: 1.05rem; height: 1.05rem; opacity: .72; }
-  .blog-ic-sm { width: .95rem; height: .95rem; opacity: .72; }
+  /* ---------- YEAR HEADERS ---------- */
+  .blog-year { scroll-margin-top: 12rem; margin-top: 1.15rem; }
+  @media (min-width: 1024px) { .blog-year { scroll-margin-top: 9rem; } }
 
-  /* Post cards */
-  .blog-item { border-radius: 1.5rem; }
-  @media (min-width: 1024px) { .blog-item { border-radius: 1.75rem; } }
+  .blog-yearhead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.1rem;
+  }
+  .blog-yearhead h2 { margin: 0; font-weight: 950; font-size: 1.65rem; letter-spacing: -0.01em; }
+  .blog-yearcount { opacity: .65; font-size: .98rem; }
+
+  .blog-divider {
+    margin-top: .6rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--bc) / .18), transparent);
+  }
+
+  /* ---------- GRID ---------- */
+  .blog-grid {
+    margin-top: 1.0rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.05rem;
+  }
+  @media (min-width: 980px) { .blog-grid { grid-template-columns: 1fr 1fr; gap: 1.1rem; } }
+
+  /* =========================================================
+     POST CARD — KEEP THE RETRO BOX BORDERS (your reference)
+     Colour ONLY the small category chip (no coloured rails)
+     ========================================================= */
+
+  .post-card {
+    position: relative;
+    border-radius: 2rem;
+    border: 2px solid hsl(var(--bc) / .14);
+    background: hsl(var(--b1) / 1);
+    overflow: hidden;
+    box-shadow:
+      0 12px 22px rgba(0,0,0,.08),
+      0 2px 0 rgba(0,0,0,.06);
+    transition: border-color 140ms ease, box-shadow 160ms ease, filter 160ms ease;
+  }
+
+  .post-card::before {
+    content: "";
+    position: absolute;
+    inset: 14px 14px auto auto;
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    background: hsl(var(--bc) / .18);
+    opacity: .25;
+    transform: rotate(12deg);
+    pointer-events: none;
+  }
+
+  .post-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .08;
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,.35) 1px, transparent 0);
+    background-size: 12px 12px;
+    mix-blend-mode: multiply;
+  }
+  [data-theme*="dark"] .post-card::after { opacity: .14; }
+
+  .post-card:hover,
+  .post-card:focus-within {
+    border-color: hsl(var(--bc) / .22);
+    box-shadow:
+      0 18px 44px rgba(0,0,0,.12),
+      0 2px 0 rgba(0,0,0,.06);
+    filter: saturate(1.06);
+  }
+
+  .post-link {
+    display: block;
+    padding: 1.15rem 1.2rem 1.05rem 1.2rem;
+  }
+  @media (min-width: 1024px) { .post-link { padding: 1.25rem 1.35rem 1.1rem 1.35rem; } }
+
+  .post-link:focus-visible {
+    outline: 3px solid hsl(var(--p) / .50);
+    outline-offset: 4px;
+    border-radius: 2rem;
+  }
+
+  .post-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+    flex-wrap: wrap;
+  }
+
+  .post-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border-radius: 9999px;
+    padding: .42rem .72rem;
+    border: 2px solid hsl(var(--bc) / .12);
+    background: hsl(var(--b2) / .55);
+    font-weight: 950;
+    font-size: .95rem;
+    box-shadow: 0 2px 0 rgba(0,0,0,.05);
+  }
+  .post-ico { width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center; }
+  .post-ico svg { width: 16px; height: 16px; display: block; opacity: .95; }
+
+  .post-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    opacity: .80;
+    font-size: .93rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .post-title {
+    margin: .82rem 0 .42rem 0;
+    font-size: 1.18rem;
+    font-weight: 950;
+    line-height: 1.24;
+    letter-spacing: -0.01em;
+  }
+  .post-underline {
+    display: inline;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 1.10em;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size 170ms ease;
+  }
+  .post-card:hover .post-underline,
+  .post-card:focus-within .post-underline { background-size: 100% 2px; }
+
+  .post-desc {
+    margin: 0;
+    opacity: .86;
+    font-size: 1.0rem;
+    line-height: 1.55;
+    max-width: 70ch;
+  }
+
+  .post-bottom {
+    margin-top: .95rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .9rem;
+  }
+  .post-tags { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+
+  .post-read {
+    display: inline-flex;
+    align-items: center;
+    gap: .48rem;
+    font-weight: 950;
+    white-space: nowrap;
+    padding: .38rem .7rem;
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--bc) / .14);
+    background: hsl(var(--b2) / .68);
+    box-shadow: 0 2px 0 rgba(0,0,0,.05);
+    opacity: .92;
+    transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
+  }
+  .post-card:hover .post-read,
+  .post-card:focus-within .post-read {
+    opacity: 1;
+    border-color: hsl(var(--bc) / .22);
+    background: hsl(var(--b2) / .82);
+  }
+
+  @media (max-width: 520px) {
+    .blog-title { font-size: 1.95rem; }
+    .post-link { padding: 1.1rem 1.05rem 1.0rem 1.05rem; }
+    .post-bottom { flex-direction: column; align-items: flex-start; gap: .6rem; }
+    .blog-yearpill { min-height: 3.2rem; height: 3.2rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-underline, .blog-yearpill { transition: none; }
+    .post-card { transition: none; }
+  }
+
+  /* ---------- Chip colour assignments (ONLY chip is coloured) ---------- */
+  .post-chip.chip-journal  { background: hsl(var(--in) / .16); border-color: hsl(var(--in) / .36); }
+  .post-chip.chip-methods  { background: hsl(var(--a)  / .16); border-color: hsl(var(--a)  / .36); }
+  .post-chip.chip-projects { background: hsl(var(--su) / .16); border-color: hsl(var(--su) / .36); }
+  .post-chip.chip-research { background: hsl(var(--p)  / .16); border-color: hsl(var(--p)  / .36); }
 </style>
 
 <div class="container mx-auto px-4">
-  <!-- Header -->
-  <header class="mt-6">
-    <div class="prose max-w-none">
-      <h1 class="mb-1">{{ section.title }}</h1>
-      <p class="opacity-75">Notes and essays — organised by year, with lightweight filters.</p>
-    </div>
-  </header>
+  <div class="blog-wrap">
 
-  {% if section.subsections | length == 0 %}
-    <div class="alert mt-8">
-      <span>No yearly sections found. Create <code>content/blog/YYYY/_index.md</code>.</span>
-    </div>
-  {% else %}
+    <header class="mt-6 blog-hero">
+      <div class="blog-kicker"><span class="k-dot" aria-hidden="true"></span> Journal · Notes · Experiments</div>
+      <div class="blog-title">{{ section.title }}</div>
+      <p class="blog-subtitle">
+        Posts are grouped by year and colour-coded by category. Pick a chip, skim the summaries, and follow what pulls you in.
+      </p>
+    </header>
 
-    {% set years = section.subsections | sort | reverse %}
-    {% set cat_tax = get_taxonomy(kind="categories") %}
-    {% set tag_tax = get_taxonomy(kind="tags") %}
-
-    <!-- Years (single render; scrolls on mobile, wraps on desktop) -->
-    <section class="mt-6" aria-label="Jump to year">
-      <div class="blog-yearbar pr-1">
-        {% for spath in years %}
-          {% set ysec = get_section(path=spath) %}
-          {% set posts = ysec.pages | sort(attribute="date") | reverse %}
-          {% if posts | length > 0 %}
-            <a class="btn btn-sm btn-outline blog-pill whitespace-nowrap"
-               href="#y{{ ysec.title }}"
-               aria-label="Jump to {{ ysec.title }}">
-              <svg class="blog-ic" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M8 2v3M16 2v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M4.5 9h15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M6 5h12a2.5 2.5 0 0 1 2.5 2.5V19A2.5 2.5 0 0 1 18 21.5H6A2.5 2.5 0 0 1 3.5 19V7.5A2.5 2.5 0 0 1 6 5Z"
-                      stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-              </svg>
-              <span>{{ ysec.title }}</span>
-              <span class="opacity-60">· {{ posts | length }}</span>
-            </a>
-          {% endif %}
-        {% endfor %}
+    {% if section.subsections | length == 0 %}
+      <div class="alert mt-8">
+        <span>No yearly sections found. Create <code>content/blog/YYYY/_index.md</code>.</span>
       </div>
-    </section>
+    {% else %}
 
-    <!-- Filters (sticky only, compact height) -->
-    <section class="mt-4 blog-filters-sticky" aria-label="Blog filters">
-      <div class="rounded-3xl border border-base-300/40 bg-base-100/90 backdrop-blur shadow-sm px-4 py-4">
+      {% set years = section.subsections | sort | reverse %}
+      {% set cat_tax = get_taxonomy(kind="categories") %}
+      {% set tag_tax = get_taxonomy(kind="tags") %}
 
-        <div class="blog-toolbar">
-          <!-- Left: controls -->
-          <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
+      <section class="mt-4" aria-label="Jump to year">
+        <div class="blog-yearbar">
+          {% for spath in years %}
+            {% set ysec = get_section(path=spath) %}
+            {% set posts = ysec.pages | sort(attribute="date") | reverse %}
+            {% if posts | length > 0 %}
+              <a class="blog-yearpill" href="#y{{ ysec.title }}" aria-label="Jump to {{ ysec.title }}">
+                <span>{{ ysec.title }}</span>
+                <span style="opacity:.65;">· {{ posts | length }}</span>
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
 
-            <div class="flex items-center gap-2 text-xs uppercase tracking-wider opacity-60">
-              <svg class="blog-ic-sm" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <section class="blog-filters" aria-label="Filters">
+        <div class="blog-filterpanel">
+          <div class="blog-filtergrid">
+            <label class="input input-bordered flex items-center gap-2 blog-control" style="border-radius:9999px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="opacity:.70;">
+                <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="1.8"/>
+                <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
-              <span>Filter</span>
-            </div>
+              <input id="filter-q" type="text" class="grow" placeholder="Search title, summary, tags…" aria-label="Search posts" />
+            </label>
 
-            <div class="flex items-center gap-2">
-              <label class="sr-only" for="filter-category">Category</label>
-              <select id="filter-category"
-                      class="select select-sm select-bordered blog-control blog-select"
-                      aria-label="Filter by category">
-                <option value="">Category · All</option>
-                {% for t in cat_tax.items | sort(attribute="name") %}
-                  <option value="{{ t.name }}">{{ t.name }} ({{ t.pages | length }})</option>
-                {% endfor %}
-              </select>
-            </div>
+            <select id="filter-category" class="select select-bordered blog-control" aria-label="Filter by category">
+              <option value="">Category · All</option>
+              {% for t in cat_tax.items | sort(attribute="name") %}
+                <option value="{{ t.name }}">{{ t.name }} ({{ t.pages | length }})</option>
+              {% endfor %}
+            </select>
 
-            <div class="flex items-center gap-2">
-              <label class="sr-only" for="filter-tag">Tag</label>
-              <select id="filter-tag"
-                      class="select select-sm select-bordered blog-control blog-select blog-select--tag"
-                      aria-label="Filter by tag">
-                <option value="">Tag · All</option>
-                {% for t in tag_tax.items | sort(attribute="name") %}
-                  <option value="{{ t.name }}">{{ t.name }} ({{ t.pages | length }})</option>
-                {% endfor %}
-              </select>
-            </div>
+            <select id="filter-tag" class="select select-bordered blog-control" aria-label="Filter by tag">
+              <option value="">Tag · All</option>
+              {% for t in tag_tax.items | sort(attribute="name") %}
+                <option value="{{ t.name }}">{{ t.name }} ({{ t.pages | length }})</option>
+              {% endfor %}
+            </select>
 
-            <button id="filter-clear" class="btn btn-sm btn-ghost blog-pill blog-control" type="button">
-              <svg class="blog-ic-sm" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              </svg>
+            <button id="filter-clear" class="btn btn-ghost blog-control" type="button" style="border-radius:9999px;">
               Clear
             </button>
           </div>
 
-          <!-- Right: status -->
-          <div class="flex justify-start lg:justify-end">
-            <span id="filter-status"
-                  class="inline-flex items-center rounded-full border border-base-300/40 px-4 py-2 bg-base-100 text-sm opacity-75">
-              Showing all posts
-            </span>
+          <div class="blog-statusrow">
+            <span id="filter-status" class="blog-statuspill">Showing all posts</span>
+            <span class="opacity-60 text-sm">Chip colour = category · icons = post type</span>
           </div>
         </div>
+      </section>
 
-      </div>
-    </section>
+      <div class="mt-6" id="blog-list" aria-label="Posts by year">
+        {% for spath in years %}
+          {% set ysec = get_section(path=spath) %}
+          {% set posts = ysec.pages | sort(attribute="date") | reverse %}
 
-    <!-- Posts -->
-    <div class="mt-8" id="blog-list" aria-label="Posts by year">
-      {% for spath in years %}
-        {% set ysec = get_section(path=spath) %}
-        {% set posts = ysec.pages | sort(attribute="date") | reverse %}
+          {% if posts | length > 0 %}
+            <section class="blog-year" id="y{{ ysec.title }}" aria-label="Posts from {{ ysec.title }}">
+              <div class="blog-yearhead">
+                <h2>{{ ysec.title }}</h2>
+                <div class="blog-yearcount">{{ posts | length }} post{% if posts | length != 1 %}s{% endif %}</div>
+              </div>
+              <div class="blog-divider" aria-hidden="true"></div>
 
-        {% if posts | length > 0 %}
-          <section class="mt-10" aria-label="Posts from {{ ysec.title }}">
-            <div id="y{{ ysec.title }}" class="blog-anchor flex items-baseline justify-between gap-4">
-              <h2 class="text-2xl font-semibold">{{ ysec.title }}</h2>
-              <span class="text-sm opacity-60">{{ posts | length }} post{% if posts | length != 1 %}s{% endif %}</span>
-            </div>
-            <div class="divider my-3"></div>
+              <div class="blog-grid">
+                {% for p in posts %}
+                  {% set category = "" %}
+                  {% if p.taxonomies and p.taxonomies.categories and p.taxonomies.categories | length > 0 %}
+                    {% set category = p.taxonomies.categories | first %}
+                  {% endif %}
 
-            <div class="space-y-3">
-              {% for p in posts %}
-                {% set category = "" %}
-                {% if p.taxonomies and p.taxonomies.categories and p.taxonomies.categories | length > 0 %}
-                  {% set category = p.taxonomies.categories | first %}
-                {% endif %}
+                  {% set tags_csv = "" %}
+                  {% if p.taxonomies and p.taxonomies.tags %}
+                    {% set tags_csv = p.taxonomies.tags | join(sep=",") %}
+                  {% endif %}
 
-                {% set tags_csv = "" %}
-                {% if p.taxonomies and p.taxonomies.tags %}
-                  {% set tags_csv = p.taxonomies.tags | join(sep=",") %}
-                {% endif %}
+                  {% set desc = p.description | default(value="") %}
+                  {% set summ = p.summary | default(value="") %}
+                  {% set blob0 = p.title ~ " " ~ desc ~ " " ~ summ ~ " " ~ tags_csv %}
+                  {% set blob1 = blob0 | striptags %}
+                  {% set search_blob = blob1 | lower %}
 
-                <a href="{{ p.permalink }}"
-                   class="blog-item blog-item-link block border border-base-300/40 bg-base-100 hover:shadow-sm transition focus:outline-none focus:ring focus:ring-primary/30"
-                   data-year="{{ ysec.title }}"
-                   data-category="{{ category }}"
-                   data-tags="{{ tags_csv | lower }}"
-                   aria-label="Open post: {{ p.title }}">
-                  <div class="p-5">
-                    <div class="flex flex-col gap-2 lg:grid lg:grid-cols-[12rem,1fr] lg:items-start">
+                  <article class="post-card"
+                    data-year="{{ ysec.title }}"
+                    data-category="{{ category }}"
+                    data-tags="{{ tags_csv | lower }}"
+                    data-search="{{ search_blob }}"
+                    aria-label="Post card: {{ p.title }}"
+                  >
+                    <a href="{{ p.permalink }}" class="post-link" aria-label="Open post: {{ p.title }}">
+                      <div class="post-top">
+                        <span class="post-chip blog-cat" data-cat="{{ category }}">
+                          <span class="post-ico" aria-hidden="true"></span>
+                          <span>{% if category and category | length > 0 %}{{ category }}{% else %}Uncategorised{% endif %}</span>
+                        </span>
 
-                      <div class="text-sm opacity-70">
-                        {% if p.date %}
-                          <time datetime="{{ p.date }}">
-                            {{ p.date | date(
-                              format=i18n_user['language_date_format'] | default(value=i18n['language_date_format']),
-                              locale=i18n_user['language_locale'] | default(value=i18n['language_locale'])
-                            ) }}
-                          </time>
-                        {% else %}
-                          <span>Undated</span>
-                        {% endif %}
+                        <div class="post-meta">
+                          {% if p.date %}
+                            <time datetime="{{ p.date }}">
+                              {{ p.date | date(
+                                format=i18n_user['language_date_format'] | default(value=i18n['language_date_format']),
+                                locale=i18n_user['language_locale'] | default(value=i18n['language_locale'])
+                              ) }}
+                            </time>
+                          {% else %}
+                            <span>Undated</span>
+                          {% endif %}
+                          {% if p.reading_time %}
+                            <span style="opacity:.55;">·</span>
+                            <span>{{ p.reading_time }} min</span>
+                          {% endif %}
+                        </div>
                       </div>
 
-                      <div>
-                        <div class="flex items-start justify-between gap-3">
-                          <h3 class="text-[1.08rem] lg:text-[1.03rem] font-semibold leading-snug">
-                            {{ p.title }}
-                          </h3>
-                          <span class="opacity-40 text-lg leading-none mt-0.5">→</span>
-                        </div>
+                      <div class="post-title">
+                        <span class="post-underline">{{ p.title }}</span>
+                      </div>
 
-                        {% if p.description %}
-                          <p class="mt-1 opacity-80 text-sm leading-relaxed">{{ p.description }}</p>
-                        {% elif p.summary %}
-                          <p class="mt-1 opacity-80 text-sm leading-relaxed">{{ p.summary | striptags | truncate(length=180) }}</p>
-                        {% endif %}
+                      {% if p.description %}
+                        <p class="post-desc">{{ p.description }}</p>
+                      {% elif p.summary %}
+                        <p class="post-desc">{{ p.summary | striptags | truncate(length=210) }}</p>
+                      {% else %}
+                        <p class="post-desc">A short note.</p>
+                      {% endif %}
 
-                        <div class="mt-3 flex flex-wrap items-center gap-2">
-                          {% if category and category | length > 0 %}
-                            <span class="badge badge-sm badge-primary badge-outline">{{ category }}</span>
-                          {% endif %}
+                      <div class="post-bottom">
+                        <div class="post-tags" aria-label="Tags">
                           {% if p.taxonomies and p.taxonomies.tags %}
                             {% for t in p.taxonomies.tags | slice(end=4) %}
                               <span class="badge badge-sm badge-ghost">{{ t }}</span>
                             {% endfor %}
                           {% endif %}
                         </div>
+
+                        <span class="post-read" aria-hidden="true">
+                          Read
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="opacity:.95;">
+                            <path d="M9 18 15 12 9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
+                    </a>
+                  </article>
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
+        {% endfor %}
+      </div>
 
-                    </div>
-                  </div>
-                </a>
-              {% endfor %}
-            </div>
-          </section>
-        {% endif %}
-      {% endfor %}
-    </div>
+      <script>
+        (function () {
+          const qEl = document.getElementById("filter-q");
+          const catEl = document.getElementById("filter-category");
+          const tagEl = document.getElementById("filter-tag");
+          const clearEl = document.getElementById("filter-clear");
+          const statusEl = document.getElementById("filter-status");
 
-    <!-- Filters JS -->
-    <script>
-      (function () {
-        const cat = document.getElementById("filter-category");
-        const tag = document.getElementById("filter-tag");
-        const clear = document.getElementById("filter-clear");
-        const status = document.getElementById("filter-status");
-        const items = Array.from(document.querySelectorAll(".blog-item"));
-        const yearSections = Array.from(document.querySelectorAll("#blog-list > section"));
+          const cards = Array.from(document.querySelectorAll(".post-card"));
+          const yearSections = Array.from(document.querySelectorAll("#blog-list > section"));
 
-        function normalise(s) { return (s || "").trim(); }
-
-        function applyFilters() {
-          const catVal = normalise(cat.value);
-          const tagVal = normalise(tag.value).toLowerCase();
-
-          let shown = 0;
-          for (const el of items) {
-            const elCat = normalise(el.dataset.category);
-            const elTags = (el.dataset.tags || "");
-
-            const okCat = !catVal || elCat === catVal;
-            const okTag = !tagVal || elTags.split(",").includes(tagVal);
-
-            const show = okCat && okTag;
-            el.style.display = show ? "" : "none";
-            if (show) shown++;
+          function iconForCategory(cat) {
+            const c = (cat || "").trim().toLowerCase();
+            if (c === "journal") return `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 4h10a2 2 0 0 1 2 2v14H8a3 3 0 0 0-3 3V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M8 20h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 8h7M9 11h7M9 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>`;
+            if (c === "methods") return `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M10 2h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M10 2v6l-4.5 8.2A4 4 0 0 0 9 22h6a4 4 0 0 0 3.5-5.8L14 8V2" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M8.5 14.5h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>`;
+            if (c === "projects") return `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 2 20 6.5V17.5L12 22 4 17.5V6.5L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M12 22V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M20 6.5 12 12 4 6.5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              </svg>`;
+            if (c === "research") return `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 20l3-6h6l3 6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M9 14c0-2 1.3-4 3-4s3 2 3 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M12 2v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>`;
+            return `
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 7h12M6 12h12M6 17h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>`;
           }
 
-          for (const sec of yearSections) {
-            const visibleAny = sec.querySelector('.blog-item:not([style*="display: none"])') !== null;
-            sec.style.display = visibleAny ? "" : "none";
+          function applyCategoryLock() {
+            const chips = Array.from(document.querySelectorAll(".blog-cat"));
+            for (const chip of chips) {
+              const name = (chip.dataset.cat || "").trim();
+              const c = name.toLowerCase();
+              const ico = chip.querySelector(".post-ico");
+              if (ico) ico.innerHTML = iconForCategory(name);
+
+              chip.classList.remove("chip-journal","chip-methods","chip-projects","chip-research");
+              if (c === "journal") chip.classList.add("chip-journal");
+              else if (c === "methods") chip.classList.add("chip-methods");
+              else if (c === "projects") chip.classList.add("chip-projects");
+              else if (c === "research") chip.classList.add("chip-research");
+            }
           }
 
-          const parts = [];
-          if (catVal) parts.push(`category: ${catVal}`);
-          if (tagVal) parts.push(`tag: ${tag.value}`);
-          status.textContent = parts.length ? `Showing ${shown} post(s) · ${parts.join(" · ")}` : "Showing all posts";
-        }
+          function norm(s){ return (s || "").trim(); }
 
-        cat.addEventListener("change", applyFilters);
-        tag.addEventListener("change", applyFilters);
-        clear.addEventListener("click", function () {
-          cat.value = "";
-          tag.value = "";
+          function applyFilters() {
+            const q = norm(qEl.value).toLowerCase();
+            const cat = norm(catEl.value);
+            const tag = norm(tagEl.value).toLowerCase();
+
+            let shown = 0;
+            for (const card of cards) {
+              const cCat = norm(card.dataset.category);
+              const cTags = (card.dataset.tags || "");
+              const cSearch = (card.dataset.search || "");
+              const okCat = !cat || cCat === cat;
+              const okTag = !tag || cTags.split(",").includes(tag);
+              const okQ = !q || cSearch.includes(q);
+
+              const show = okCat && okTag && okQ;
+              card.hidden = !show;
+              if (show) shown++;
+            }
+
+            for (const sec of yearSections) {
+              sec.hidden = (sec.querySelector(".post-card:not([hidden])") === null);
+            }
+
+            const parts = [];
+            if (q) parts.push(`search: “${q}”`);
+            if (cat) parts.push(`category: ${cat}`);
+            if (tag) parts.push(`tag: ${tagEl.value}`);
+
+            statusEl.textContent = parts.length
+              ? `Showing ${shown} post(s) · ${parts.join(" · ")}`
+              : "Showing all posts";
+          }
+
+          qEl.addEventListener("input", applyFilters);
+          catEl.addEventListener("change", applyFilters);
+          tagEl.addEventListener("change", applyFilters);
+          clearEl.addEventListener("click", () => {
+            qEl.value = ""; catEl.value = ""; tagEl.value = "";
+            applyFilters();
+          });
+
+          applyCategoryLock();
           applyFilters();
-        });
+        })();
+      </script>
 
-        applyFilters();
-      })();
-    </script>
-
-  {% endif %}
+    {% endif %}
+  </div>
 </div>
 {% endblock content %}

@@ -1,0 +1,96 @@
+{# Usage:
+  {{ wasm_demo(
+      title="MC Packing Visualiser",
+      description="Click to load. Exports PNG/CSV/JSON. Shareable URLs.",
+      demo_path="demos/mc_packing/index.html",
+      height="640",
+      button="Launch demo"
+  ) }}
+#}
+
+{% set title = title | default(value="Interactive demo") %}
+{% set description = description | default(value="") %}
+{% set demo_path = demo_path | default(value="demos/mc_packing/index.html") %}
+{% set height = height | default(value="560") %}
+{% set button = button | default(value="Launch demo") %}
+{% set id = id | default(value="wasm_demo_" ~ demo_path | replace(from="/", to="_") | replace(from=".", to="_")) %}
+
+<div class="not-prose my-8 rounded-3xl border border-base-300/60 bg-base-100 shadow-sm p-5">
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div class="min-w-0">
+      <div class="text-lg font-semibold">{{ title }}</div>
+      {% if description and description | length > 0 %}
+        <p class="mt-1 opacity-75">{{ description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="flex gap-2 shrink-0">
+      <button
+        class="btn btn-sm btn-primary rounded-full"
+        type="button"
+        data-wasm-btn="{{ id }}"
+        data-wasm-src="/{{ demo_path }}"
+      >
+        {{ button }}
+      </button>
+
+      <a class="btn btn-sm btn-ghost rounded-full"
+         href="/{{ demo_path }}"
+         target="_blank" rel="noopener">
+        Fullscreen ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-4 hidden" id="{{ id }}_wrap">
+    <iframe
+      id="{{ id }}"
+      class="w-full rounded-2xl border border-base-300/60 bg-base-100"
+      style="height: {{ height }}px;"
+      loading="lazy"
+      sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+      referrerpolicy="no-referrer"
+      title="{{ title }}"
+    ></iframe>
+  </div>
+
+  <p class="mt-3 text-sm opacity-70" id="{{ id }}_hint">
+    Loads only after you click <span class="font-semibold">{{ button }}</span>.
+  </p>
+</div>
+
+<script>
+(function(){
+  if (window.__wasmLaunchInstalled) return;
+  window.__wasmLaunchInstalled = true;
+
+  document.addEventListener("click", function(e){
+    const btn = e.target.closest("[data-wasm-btn]");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-wasm-btn");
+    const src = btn.getAttribute("data-wasm-src");
+
+    const wrap = document.getElementById(id + "_wrap");
+    const iframe = document.getElementById(id);
+    const hint = document.getElementById(id + "_hint");
+
+    if (!wrap || !iframe) return;
+
+    wrap.classList.remove("hidden");
+    if (hint) hint.classList.add("hidden");
+
+    if (iframe.getAttribute("src")) return;
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+
+    requestAnimationFrame(() => {
+      iframe.setAttribute("src", src);
+      btn.classList.remove("loading");
+      btn.textContent = "Loaded";
+      btn.disabled = false;
+    });
+  });
+})();
+</script>

@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <title>MC Packing Lab</title>
+
+    <!-- Important for nested hosting (GitHub Pages subpaths) -->
+    <base data-trunk-public-url />
+
+    <!-- Trunk entry -->
+    <link data-trunk rel="rust" href="Cargo.toml" data-wasm-opt="z" />
+
+    <style>
+      :root {
+        --bg: transparent;
+        --glass: rgba(12, 12, 14, 0.76);
+        --glass-2: rgba(12, 12, 14, 0.54);
+        --stroke: rgba(255, 255, 255, 0.12);
+        --stroke-2: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.62);
+        --muted-2: rgba(255, 255, 255, 0.44);
+        --chip: rgba(255, 255, 255, 0.10);
+        --chip-h: rgba(255, 255, 255, 0.16);
+        --focus: rgba(160, 200, 255, 0.55);
+
+        --r: 18px;
+        --r2: 999px;
+
+        --pad: 14px;
+        --gap: 10px;
+
+        --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans",
+          "Apple Color Emoji", "Segoe UI Emoji";
+
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        font-family: var(--font);
+        color: var(--text);
+      }
+
+      /* Avoid scrollbars in iframes; we keep the UI overlay internal */
+      body { overflow: hidden; }
+
+      /* App frame */
+      #app {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      /* Canvas fills the whole frame */
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        touch-action: none;
+      }
+
+      /* Top bar */
+      .topbar {
+        position: absolute;
+        top: env(safe-area-inset-top, 0px);
+        left: env(safe-area-inset-left, 0px);
+        right: env(safe-area-inset-right, 0px);
+        padding: calc(var(--pad) + 2px);
+        pointer-events: none; /* allow dragging canvas; enable only on interactive children */
+        display: flex;
+        gap: var(--gap);
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+
+      .panel {
+        pointer-events: auto;
+        background: var(--glass);
+        border: 1px solid var(--stroke);
+        border-radius: var(--r);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .panel.pad { padding: var(--pad); }
+
+      .brand {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: var(--r2);
+        background: var(--glass-2);
+        border: 1px solid var(--stroke-2);
+        max-width: 64vw;
+      }
+
+      .brand .kicker {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .brand .title {
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--text);
+        white-space: nowrap;
+      }
+
+      .brand .meta {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted-2);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Buttons */
+      .btnrow {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      button, select, input {
+        font: inherit;
+        color: inherit;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid var(--stroke);
+        background: rgba(255, 255, 255, 0.10);
+        padding: 10px 12px;
+        border-radius: var(--r2);
+        cursor: pointer;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+        transition: transform 80ms ease, background 120ms ease, border-color 120ms ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, 0.18); }
+      .btn:active { transform: translateY(1px); }
+      .btn.primary { background: rgba(160, 200, 255, 0.20); border-color: rgba(160, 200, 255, 0.28); }
+      .btn.primary:hover { background: rgba(160, 200, 255, 0.28); }
+
+      .btn:focus-visible, select:focus-visible, input:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      /* Bottom sheet / sidebar */
+      .dock {
+        position: absolute;
+        bottom: env(safe-area-inset-bottom, 0px);
+        left: env(safe-area-inset-left, 0px);
+        right: env(safe-area-inset-right, 0px);
+        padding: var(--pad);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--gap);
+        pointer-events: none;
+      }
+
+      .controls {
+        pointer-events: auto;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--gap);
+      }
+
+      /* Collapsible panel */
+      details.panel {
+        overflow: hidden;
+      }
+
+      summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 12px 14px;
+        user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      summary::-webkit-details-marker { display: none; }
+
+      .sum-left {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        min-width: 0;
+      }
+      .sum-left .h {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+      .sum-left .sub {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .chev {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 10px;
+        padding: 0 14px 14px 14px;
+      }
+
+      /* Inputs layout */
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .field {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid var(--stroke-2);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      input[type="text"], input[type="number"], select {
+        width: 100%;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 13px;
+        color: var(--text);
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid var(--stroke-2);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .toggle input {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* Stats */
+      .stats {
+        pointer-events: auto;
+        padding: 12px 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .statsgrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .stat {
+        border: 1px solid var(--stroke-2);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 14px;
+        padding: 10px 10px;
+        min-width: 0;
+      }
+
+      .stat .k {
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .stat .v {
+        margin-top: 6px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .status {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* Loader */
+      #loader {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.18);
+        color: rgba(255, 255, 255, 0.86);
+        pointer-events: none;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: var(--r2);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(12, 12, 14, 0.72);
+      }
+
+      .spin {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        border-top-color: rgba(255, 255, 255, 0.78);
+        animation: spin 900ms linear infinite;
+      }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      html[data-wasm-ready="1"] #loader { display: none; }
+
+      /* Responsive: on desktop, dock becomes a sidebar style */
+      @media (min-width: 980px) {
+        .dock {
+          top: 76px;
+          bottom: auto;
+          left: 14px;
+          right: auto;
+          width: 420px;
+        }
+        .topbar { padding: 14px; }
+        .brand { max-width: none; }
+      }
+
+      /* Mobile touch: make tap targets larger */
+      @media (max-width: 520px) {
+        .btn { padding: 12px 14px; }
+        summary { padding: 14px; }
+        .statsgrid { grid-template-columns: repeat(2, 1fr); }
+        .row { grid-template-columns: 1fr; }
+      }
+
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        .spin { animation: none; }
+        .btn { transition: none; }
+      }
+    </style>
+
+    <script>
+      // Hide loader when Rust signals readiness (or after a timeout).
+      window.setWasmReady = function () {
+        document.documentElement.dataset.wasmReady = "1";
+      };
+      window.addEventListener("wasm:ready", () => window.setWasmReady());
+      setTimeout(() => window.setWasmReady(), 10000);
+    </script>
+  </head>
+
+  <body>
+    <main id="app">
+      <canvas id="canvas" width="1200" height="800" aria-label="Monte Carlo packing canvas"></canvas>
+
+      <!-- TOP BAR -->
+      <div class="topbar" role="region" aria-label="Header actions">
+        <div class="brand panel">
+          <div class="kicker">MC Packing</div>
+          <div class="title">Lab</div>
+          <div class="meta">Rust · WASM · Trunk</div>
+        </div>
+
+        <div class="btnrow panel pad" aria-label="Primary actions">
+          <button id="btn-run" class="btn primary" type="button">Pause</button>
+          <button id="btn-step" class="btn" type="button" title="Advance a fixed number of moves">Step</button>
+          <button id="btn-apply" class="btn" type="button" title="Apply controls and reset">Apply</button>
+        </div>
+      </div>
+
+      <!-- DOCK (controls + stats) -->
+      <div class="dock" role="region" aria-label="Controls and stats">
+        <!-- CONTROLS -->
+        <details class="panel" open>
+          <summary>
+            <div class="sum-left">
+              <div class="h">Controls</div>
+              <div class="sub">reproducible parameters · mixture · shrink</div>
+            </div>
+            <div class="chev" aria-hidden="true">▾</div>
+          </summary>
+
+          <div class="grid" aria-label="Simulation controls">
+            <div class="row">
+              <label>
+                Seed
+                <div class="field"><input id="input-seed" type="number" inputmode="numeric" min="0" step="1" value="42" /></div>
+              </label>
+
+              <label>
+                N particles
+                <div class="field"><input id="input-n" type="number" inputmode="numeric" min="1" step="1" value="220" /></div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Shape
+                <div class="field">
+                  <select id="input-shape">
+                    <option value="disk">disk</option>
+                    <option value="rect">rect</option>
+                    <option value="tri">tri</option>
+                    <option value="square">square</option>
+                    <option value="hex">hex</option>
+                    <option value="oct">oct</option>
+                  </select>
+                </div>
+              </label>
+
+              <label>
+                Geometry
+                <div class="field">
+                  <select id="input-geometry">
+                    <option value="box">box</option>
+                    <option value="circle">circle</option>
+                  </select>
+                </div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Final radius (r)
+                <div class="field"><input id="input-r" type="number" min="1" step="0.25" value="6.0" /></div>
+              </label>
+
+              <label>
+                Rect aspect
+                <div class="field"><input id="input-aspect" type="number" min="1" step="0.1" value="2.0" /></div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                Step size (Δx)
+                <div class="field"><input id="input-step" type="number" min="0" step="0.5" value="8.0" /></div>
+              </label>
+
+              <label>
+                Rot step (Δθ)
+                <div class="field"><input id="input-rotstep" type="number" min="0" step="0.01" value="0.25" /></div>
+              </label>
+            </div>
+
+            <div class="row">
+              <label>
+                β (inverse T)
+                <div class="field"><input id="input-beta" type="number" min="0.01" step="0.1" value="2.0" /></div>
+              </label>
+
+              <label>
+                Pressure
+                <div class="field"><input id="input-pressure" type="number" min="0" step="0.1" value="2.5" /></div>
+              </label>
+            </div>
+
+            <label>
+              Volume step (box only)
+              <div class="field"><input id="input-volstep" type="number" min="0" step="0.001" value="0.02" /></div>
+            </label>
+
+            <div class="row">
+              <div class="toggle">
+                <div>
+                  <div style="font-size:12px;color:var(--muted)">PBC</div>
+                  <div style="font-size:11px;color:var(--muted-2);font-family:var(--mono)">box only</div>
+                </div>
+                <input id="input-pbc" type="checkbox" checked />
+              </div>
+
+              <div class="toggle">
+                <div>
+                  <div style="font-size:12px;color:var(--muted)">Mix shapes</div>
+                  <div style="font-size:11px;color:var(--muted-2);font-family:var(--mono)">use weights</div>
+                </div>
+                <input id="input-mix" type="checkbox" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="toggle">
+                <div>
+                  <div style="font-size:12px;color:var(--muted)">Shrink schedule</div>
+                  <div style="font-size:11px;color:var(--muted-2);font-family:var(--mono)">big → final</div>
+                </div>
+                <input id="input-shrink" type="checkbox" checked />
+              </div>
+
+              <div class="toggle">
+                <div>
+                  <div style="font-size:12px;color:var(--muted)">Hardness anneal</div>
+                  <div style="font-size:11px;color:var(--muted-2);font-family:var(--mono)">soft → hard</div>
+                </div>
+                <input id="input-hard" type="checkbox" checked />
+              </div>
+            </div>
+
+            <div class="row">
+              <label>
+                r0 multiplier
+                <div class="field"><input id="input-r0" type="number" min="1" step="0.1" value="2.0" /></div>
+              </label>
+              <label>
+                shrink τ (moves)
+                <div class="field"><input id="input-stau" type="number" min="1000" step="1000" value="250000" /></div>
+              </label>
+            </div>
+
+            <label>
+              hardness τ (moves)
+              <div class="field"><input id="input-htau" type="number" min="1000" step="1000" value="250000" /></div>
+            </label>
+
+            <!-- Mix weights (optional; safe even if mix off) -->
+            <div class="row">
+              <label>disk weight<div class="field"><input id="input-wdisk" type="number" min="0" step="0.1" value="1.0" /></div></label>
+              <label>rect weight<div class="field"><input id="input-wrect" type="number" min="0" step="0.1" value="0.0" /></div></label>
+            </div>
+            <div class="row">
+              <label>tri weight<div class="field"><input id="input-wtri" type="number" min="0" step="0.1" value="0.0" /></div></label>
+              <label>square weight<div class="field"><input id="input-wsquare" type="number" min="0" step="0.1" value="0.0" /></div></label>
+            </div>
+            <div class="row">
+              <label>hex weight<div class="field"><input id="input-whex" type="number" min="0" step="0.1" value="0.0" /></div></label>
+              <label>oct weight<div class="field"><input id="input-woct" type="number" min="0" step="0.1" value="0.0" /></div></label>
+            </div>
+
+            <!-- Export + share -->
+            <div class="btnrow" aria-label="Export and sharing actions">
+              <button id="btn-copylink" class="btn" type="button" title="Copy a shareable URL">Copy link</button>
+              <button id="btn-png" class="btn" type="button" title="Download a PNG snapshot">PNG</button>
+              <button id="btn-csv" class="btn" type="button" title="Download CSV state + metrics">CSV</button>
+              <button id="btn-json" class="btn" type="button" title="Download JSON config + state">JSON</button>
+            </div>
+          </div>
+        </details>
+
+        <!-- STATS -->
+        <div class="panel stats" aria-label="Simulation stats">
+          <div class="statsgrid">
+            <div class="stat">
+              <div class="k">Packing φ</div>
+              <div id="stat-phi" class="v">0.0000</div>
+            </div>
+            <div class="stat">
+              <div class="k">Energy</div>
+              <div id="stat-energy" class="v">0.000</div>
+            </div>
+            <div class="stat">
+              <div class="k">Overlap</div>
+              <div id="stat-overlap" class="v">0.0000</div>
+            </div>
+            <div class="stat">
+              <div class="k">Max pen</div>
+              <div id="stat-maxpen" class="v">0.000</div>
+            </div>
+            <div class="stat">
+              <div class="k">Acc Δx</div>
+              <div id="stat-accT" class="v">0.0%</div>
+            </div>
+            <div class="stat">
+              <div class="k">Acc Δθ</div>
+              <div id="stat-accR" class="v">0.0%</div>
+            </div>
+            <div class="stat">
+              <div class="k">Acc V</div>
+              <div id="stat-accV" class="v">0.0%</div>
+            </div>
+            <div class="stat">
+              <div class="k">Moves</div>
+              <div id="stat-iters" class="v">0</div>
+            </div>
+          </div>
+
+          <div class="status" id="stat-status">Ready.</div>
+        </div>
+      </div>
+
+      <!-- Loader -->
+      <div id="loader" aria-live="polite">
+        <div class="pill">
+          <span class="spin" aria-hidden="true"></span>
+          <span>Loading WASM…</span>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Quality-of-life: prevent accidental “scroll rubber band” on trackpads inside iframe.
+      // The canvas should capture most gestures; the UI is internal.
+      document.addEventListener("wheel", (e) => {
+        // Allow wheel inside the details panel for scrolling if content ever overflows.
+        const inPanel = e.target && e.target.closest && e.target.closest("details.panel");
+        if (!inPanel) e.preventDefault();
+      }, { passive: false });
+    </script>
+  </body>
+</html>
