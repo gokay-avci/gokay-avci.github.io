@@ -10,8 +10,8 @@ Simulating the evolution of crystal grains in a metal during annealing.
 
 
 [extra]
-cover = "2.jpg"
-cover_alt = "sample"
+cover = "grain_simulate.jpg"
+cover_alt = "Simulate grains!"
 +++
 
 [Open fullscreen](/demos/grains/index.html)

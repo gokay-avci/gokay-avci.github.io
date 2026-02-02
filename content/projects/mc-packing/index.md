@@ -11,8 +11,8 @@ Use the **Copy link** button inside the demo to generate a shareable link.
 
 
 [extra]
-cover = "1.jpg"
-cover_alt = "sample"
+cover = "mc_packing.jpg"
+cover_alt = "Pack spheres with monte carlo method!"
 +++
 
 
