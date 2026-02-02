@@ -12,8 +12,8 @@
     <!-- Trunk entry -->
     
 <script type="module">
-import init, * as bindings from '/demos/porosity_lab/porosity_lab-e14f7f6074caf289.js';
-const wasm = await init({ module_or_path: '/demos/porosity_lab/porosity_lab-e14f7f6074caf289_bg.wasm' });
+import init, * as bindings from '/demos/porosity_lab/porosity_lab-41d4e231c2f90213.js';
+const wasm = await init({ module_or_path: '/demos/porosity_lab/porosity_lab-41d4e231c2f90213_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -222,7 +222,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       // safety fallback
       setTimeout(() => window.setWasmReady(), 10000);
     </script>
-  <link rel="modulepreload" href="/demos/porosity_lab/porosity_lab-e14f7f6074caf289.js" crossorigin="anonymous" integrity="sha384-NXF/n2lRI7CV1pr10O7eviT/M9YsEMYOv3BLdBWwqNA76Etd6EJCvuey2sDcMURd"><link rel="preload" href="/demos/porosity_lab/porosity_lab-e14f7f6074caf289_bg.wasm" crossorigin="anonymous" integrity="sha384-LEVkp9uJ+UVXxxM7nK/y6mgFyg3lvRuQixDXkpLxmA463Foi00vqhKrTylqmsgVz" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/demos/porosity_lab/porosity_lab-41d4e231c2f90213.js" crossorigin="anonymous" integrity="sha384-FhPY6zVNiECf5k7gP97TuuUO57yo3uaiGgoa4xLOQQHJAvLQGUKzsNwIx/sfksS8"><link rel="preload" href="/demos/porosity_lab/porosity_lab-41d4e231c2f90213_bg.wasm" crossorigin="anonymous" integrity="sha384-DD8Uce8eu1lxQqbpm/Go2Hu2DLOCE91WhcWLmD96eiS8RlwpGqNKFb7NQU+TL/XN" as="fetch" type="application/wasm"></head>
 
   <body>
     <main id="app">
