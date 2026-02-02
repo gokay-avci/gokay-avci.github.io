@@ -5,13 +5,12 @@ description = "Q-State Potts Model."
 template = "page.html"
 [extra]
 toc = true
+cover = "grain_simulate.jpg"
+cover_alt = "Simulate grains!"
 +++
 Simulating the evolution of crystal grains in a metal during annealing.
 
 
-[extra]
-cover = "grain_simulate.jpg"
-cover_alt = "Simulate grains!"
-+++
+
 
 [Open fullscreen](/demos/grains/index.html)

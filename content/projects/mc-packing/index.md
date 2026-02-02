@@ -2,6 +2,10 @@
 title = "MC Packing Visualiser"
 date = 2026-01-11
 description = "Hard-disk Monte Carlo packing with reproducible, shareable URLs."
+
+[extra]
+cover = "amc_packing.jpg"
+cover_alt = "Pack spheres with monte carlo method!"
 +++
 
 This interactive method demonstrates a simple Monte Carlo hard-disk packing process.
@@ -10,10 +14,7 @@ This interactive method demonstrates a simple Monte Carlo hard-disk packing proc
 Use the **Copy link** button inside the demo to generate a shareable link.
 
 
-[extra]
-cover = "amc_packing.jpg"
-cover_alt = "Pack spheres with monte carlo method!"
-+++
+
 
 
 {{ wasm_demo(
