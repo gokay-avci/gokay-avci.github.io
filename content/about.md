@@ -5,24 +5,24 @@ weight = 1
 template = "page.html"
 +++
 
-# About Voxel Space 🚀
+# About my blog
 
-Voxel Space is my **notebook-in-public** — where **research**, **code**, and **curiosity** collide (politely… most of the time).
+Welcome to my blog! Here you can find a plethora of information related to my past/present/future professional work and some personal blog style information. 
 
 It’s a mix of:
 - **Work blog:** computational materials science, molecular simulation, HPC, and building reliable tools
-- **Personal blog:** learning, experimenting, organising life/projects, and the occasional “why am I like this?” moment
+- **Personal blog:** learning, experimenting, organising life/projects, general existential crisis resolutions of a researcher.
 
-If you like **practical science**, **robust engineering**, and **human writing**, you’ll feel at home here.
+If you enjoy and would like to learn more about establishing reproducible scientific workflows, meditation, high throughput computational screening practices, scientific coding, and a bit of woodwind instruments, you should feel like home1!
 
 ---
 
-## The vibe ✨
+## The overall vibe
 
 - 🔬 **Serious science, playful delivery**
-- 🧰 **Tools over theory** (but yes, we do the theory too)
-- 🧱 **Build it. Break it. Fix it. Document it.**
-- 📈 **Scale matters** — from laptop experiments to cluster-scale workflows
+- 🧰 **Tools over theory** (but yes, there is some theory too)
+- 🧱 **Build it. Break it. Fix it. Document it. Rinse and repeat**
+- 📈 **Scale matters** — from laptop experiments to multi cluster node scale workflows
 
 ---
 
@@ -30,7 +30,7 @@ If you like **practical science**, **robust engineering**, and **human writing**
 
 I work at the intersection of **computational chemistry/materials** and **software engineering**.
 
-That often looks like:
+I started learning programming in around 2016 when people rarely cared about documenting their findings and you had to install certain software in a very specific way (fingers crossed) which may or may not work/run on your particular environment. My doctoral work was on high throughput screening of Metal Organic Frameworks for gas sorption and diffusion studies yet my interests have evolved to a broader materials class and an expanded range of techniques eventually:
 
 - **Porous molecular materials**  
   MOFs, cages, supramolecular systems, host–guest chemistry
@@ -39,78 +39,71 @@ That often looks like:
   Monte Carlo, molecular dynamics, DFT, fast proxies, automated pipelines
 
 - **Design-space exploration**  
-  evolutionary algorithms, active learning, surrogate models, “search smarter”
+  evolutionary algorithms, active learning, surrogate models, “search smarter and save resources”
 
 - **HPC workflows that don’t implode**  
   orchestration, fault tolerance, I/O bottlenecks, databases, job scheduling reality
 
-- **Visualisation that makes results *feel real***  
-  interactive dashboards, snapshots, Blender renders (because yes)
+- **Visualisation that makes results *alive***  
+  interactive dashboards, snapshots, Blender renders (you will see a lot of blendering)
 
 ---
 
-## Why this site exists 🧭
+## Why this site exists 
 
 Because too much valuable work disappears into:
-- random scripts named `final_final_v7.py`
+- random scripts named `final_final_v7.py` (been there quite a lot personally)
 - cluster logs nobody reads
-- notebooks that only run on one person’s laptop
-- “I’ll remember how I did that” (no you won’t)
+- notebooks that only run on one person’s unique environment
+- “I’ll remember how I did that” (lets meet here again in 1 year)
 
-Voxel Space is where I turn that mess into:
-- ✅ reproducible notes  
-- ✅ reusable code patterns  
-- ✅ clear explanations  
-- ✅ honest post-mortems when something fails
+This blog is a chivalirous attempt to:
+- ✅ Present guidelines for reproducible notes  
+- ✅ Motive implementation of reusable code patterns  
+- ✅ Strategies for clear explanations  
+- ✅ Personal preference agnostic honest post-mortems when something fails
 
 ---
 
-## What I care about (a lot) ❤️
+## What I care about 
 
-### ✅ Correct → then fast → then beautiful
-I’m obsessed with systems that are:
+
+###  Correct → then fast → then beautiful
+I’m gradually getting more obsessed with systems that are:
 - **hard to misuse**
 - **easy to reproduce**
 - **fast enough to scale**
 - and **pleasant enough to maintain**
 
-### 🧠 Design spaces > single answers
-I’m less interested in *one* structure and more interested in *how to search* chemical space intelligently.
 
-### 🧯 Defensive engineering
-If a workflow can fail, it will.  
-So I build with guard rails: validation, logging, testing, traceability.
 
----
+## Rust will show up quite a lot 
 
-## Rust shows up a lot 🦀
-
-Not as a personality trait — as a practical choice.
+As like most people who enjoy scientific coding/programming, my first stab was with python. Although I adore many aspects of using python, I eventually was brought the presence of a programming language named Rust. It is still in development but I belive it is mature enough to use without constantly updating your APIs with a lot of significant benefits when compared to a dynamic language such as Python. 
 
 I like Rust because it helps me build scientific tooling that is:
 - **fast**
 - **safe**
 - **composable**
-- and doesn’t quietly corrupt your results at 3am on node 73
-
+- **generic**
 ---
 
-## My toolbox ⚙️
+## My toolbox
 
 | Area | What I use |
 | :--- | :--- |
-| **Languages** | Rust (systems + HPC), Python (research glue), some C/C++ when needed |
+| **Languages** | Rust (systems + HPC), Python (research glue), some simple C/C++ scripting |
 | **Compute** | HPC orchestration, schedulers, fault tolerance, reproducible environments |
 | **Science** | MD / MC, DFT, porous materials, host–guest workflows |
-| **Web & UI** | Zola for writing, WebAssembly demos when useful, lightweight dashboards |
-| **Tools** | Git, containers, SQLite/embedded DBs, LaTeX/Typst, Blender |
+| **Web & UI** | Typst for LaTeX, WebAssembly demos when useful, lightweight TUI dashboards with RataUI |
+| **Tools** | Git, docker containers, SQLite/embedded DBs, Blender |
 
 ---
 
-## How to read this site 📚
+## How to read this site 
 
 Some posts are polished.  
-Many are **fresh-from-the-workbench**.
+Many are **random scribbles**.
 
 In most posts I aim for:
 - a quick idea summary
@@ -122,7 +115,7 @@ In most posts I aim for:
 
 ## Say hi 👋
 
-If you want to collaborate, compare notes, or share a good trick (or a good failure), feel free to reach out.
+If you want to collaborate, compare notes, or share a good trick (or a good failure), feel free to reach out. Best way to reach out to me is via e-mailing on gokayavcichem@gmail.com
 
-> Voxel Space is where my research brain and builder brain meet…  
-> then start drawing diagrams on the walls.
+> This is a space where ideas get the opportunity to meet with reality 
+> then start drawing diagrams on the walls

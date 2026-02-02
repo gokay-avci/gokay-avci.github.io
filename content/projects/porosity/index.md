@@ -8,7 +8,7 @@ tags = ["Rust", "WASM", "Materials"]
 categories = ["Projects"]
 
 [extra]
-cover = "projects/hpc.jpg"
+cover = "porosity.jpg"
 cover_alt = "Fitness landscape visualisation"
 +++
 

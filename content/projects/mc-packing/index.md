@@ -9,6 +9,13 @@ This interactive method demonstrates a simple Monte Carlo hard-disk packing proc
 **Reproducibility:** parameters are encoded in the URL (`seed`, `n`, `r`, `step`, `iters`).
 Use the **Copy link** button inside the demo to generate a shareable link.
 
+
+[extra]
+cover = "1.jpg"
+cover_alt = "sample"
++++
+
+
 {{ wasm_demo(
   title="MC Packing Visualiser",
   description="Click to load. Export PNG/CSV/JSON and share via URL parameters.",
