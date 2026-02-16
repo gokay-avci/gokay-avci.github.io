@@ -13,7 +13,7 @@ It’s a mix of:
 - **Work blog:** computational materials science, molecular simulation, HPC, and building reliable tools
 - **Personal blog:** learning, experimenting, organising life/projects, general existential crisis resolutions of a researcher.
 
-If you enjoy and would like to learn more about establishing reproducible scientific workflows, meditation, high throughput computational screening practices, scientific coding, and a bit of woodwind instruments, you should feel like home1!
+If you enjoy and would like to learn more about establishing reproducible scientific workflows, meditation, high throughput computational screening practices, scientific coding, and a bit of woodwind instruments, you should feel at home!
 
 ---
 
@@ -30,7 +30,7 @@ If you enjoy and would like to learn more about establishing reproducible scient
 
 I work at the intersection of **computational chemistry/materials** and **software engineering**.
 
-I started learning programming in around 2016 when people rarely cared about documenting their findings and you had to install certain software in a very specific way (fingers crossed) which may or may not work/run on your particular environment. My doctoral work was on high throughput screening of Metal Organic Frameworks for gas sorption and diffusion studies yet my interests have evolved to a broader materials class and an expanded range of techniques eventually:
+I started learning programming in around 2016 when people rarely cared about documenting their findings and you had to install certain software in a very specific way (fingers crossed) which may or may not work/run on your particular environment. My doctoral work was on high throughput screening of Metal Organic Frameworks for gas sorption and diffusion studies, yet my interests have evolved to a broader materials class and an expanded range of techniques:
 
 - **Porous molecular materials**  
   MOFs, cages, supramolecular systems, host–guest chemistry
@@ -57,9 +57,9 @@ Because too much valuable work disappears into:
 - notebooks that only run on one person’s unique environment
 - “I’ll remember how I did that” (lets meet here again in 1 year)
 
-This blog is a chivalirous attempt to:
+This blog is a chivalrous attempt to:
 - ✅ Present guidelines for reproducible notes  
-- ✅ Motive implementation of reusable code patterns  
+- ✅ Motivate implementation of reusable code patterns
 - ✅ Strategies for clear explanations  
 - ✅ Personal preference agnostic honest post-mortems when something fails
 
@@ -79,7 +79,7 @@ I’m gradually getting more obsessed with systems that are:
 
 ## Rust will show up quite a lot 
 
-As like most people who enjoy scientific coding/programming, my first stab was with python. Although I adore many aspects of using python, I eventually was brought the presence of a programming language named Rust. It is still in development but I belive it is mature enough to use without constantly updating your APIs with a lot of significant benefits when compared to a dynamic language such as Python. 
+Like most people in scientific computing, my first stab at programming was with Python. Although I adore many aspects of Python, I eventually discovered Rust. While still evolving, I believe it is mature enough to use for production without constantly updating APIs, offering significant benefits over dynamic languages like Python.
 
 I like Rust because it helps me build scientific tooling that is:
 - **fast**
@@ -115,7 +115,7 @@ In most posts I aim for:
 
 ## Say hi 👋
 
-If you want to collaborate, compare notes, or share a good trick (or a good failure), feel free to reach out. Best way to reach out to me is via e-mailing on gokayavcichem@gmail.com
+If you want to collaborate, compare notes, or share a good trick (or a good failure), feel free to reach out. The best way to reach me is via email at [gokayavcichem@gmail.com](mailto:gokayavcichem@gmail.com).
 
 > This is a space where ideas get the opportunity to meet with reality 
 > then start drawing diagrams on the walls
