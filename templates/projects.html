@@ -20,6 +20,7 @@
   {% if pages | length > 0 %}
     <div class="grid gap-4 pb-10 md:grid-cols-2">
       {% for p in pages %}
+        {% set page_url = p.permalink | replace(from=config.base_url, to="") %}
         <article class="rounded-3xl border border-base-300/50 bg-base-100 shadow-sm overflow-hidden">
 
           {% set cover = "" %}
@@ -31,10 +32,10 @@
             {% if cover is starting_with("/") or cover is starting_with("http://") or cover is starting_with("https://") %}
               {% set cover_url = cover %}
             {% else %}
-              {% set cover_url = p.permalink ~ cover %}
+              {% set cover_url = page_url ~ cover %}
             {% endif %}
 
-            <a href="{{ p.permalink }}" aria-label="Open: {{ p.title }}">
+            <a href="{{ page_url }}" aria-label="Open: {{ p.title }}">
               <img src="{{ cover_url }}" alt="{{ p.extra.cover_alt | default(value=p.title) }}"
                    loading="lazy" decoding="async" class="w-full aspect-[16/9] object-cover" />
             </a>
@@ -43,7 +44,7 @@
           <div class="p-5">
             <div class="flex items-start justify-between gap-4">
               <h2 class="text-lg font-semibold leading-snug">
-                <a class="link link-hover" href="{{ p.permalink }}">{{ p.title }}</a>
+                <a class="link link-hover" href="{{ page_url }}">{{ p.title }}</a>
               </h2>
 
               {% if p.date %}
@@ -67,6 +68,17 @@
                 {% for t in p.taxonomies.tags | slice(end=6) %}
                   <span class="badge badge-outline">{{ t }}</span>
                 {% endfor %}
+              </div>
+            {% endif %}
+
+            {% if p.extra and (p.extra.demo or p.extra.fullscreen) %}
+              <div class="mt-4 flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-primary rounded-full" href="{{ page_url }}">Project page</a>
+                {% if p.extra.demo %}
+                  <a class="btn btn-sm btn-outline rounded-full" href="{{ p.extra.demo }}">Open demo</a>
+                {% elif p.extra.fullscreen %}
+                  <a class="btn btn-sm btn-outline rounded-full" href="{{ p.extra.fullscreen }}">Open demo</a>
+                {% endif %}
               </div>
             {% endif %}
           </div>

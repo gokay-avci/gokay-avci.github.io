@@ -1,5 +1,5 @@
 [build]
 target = "index.html"
-dist = "../../static/demos/porosity_lab"
-public_url = "/demos/porosity_lab/"
+dist = "../../static/demos/ai_porosity_puzzle"
+public_url = "/demos/ai_porosity_puzzle/"
 filehash = true

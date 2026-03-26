@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+unset NO_COLOR
 echo "🏗️  Building Production..."
 rm -rf public static/demos
 echo "🦀 Compiling Rust Demos..."

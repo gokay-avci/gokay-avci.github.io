@@ -3,203 +3,300 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <title>Porosity Lab</title>
+    <title>PolyMorph Foundry</title>
+    <meta
+      name="description"
+      content="An evolutionary browser puzzle where projected crystal shapes teach pore space through play."
+    />
 
-    <!-- Critical for GitHub Pages + nested hosting + iframes -->
     <base data-trunk-public-url />
-
-    <!-- Trunk entry -->
     <link data-trunk rel="rust" href="Cargo.toml" data-wasm-opt="z" />
 
     <style>
-      :root{
-        --bg: transparent;
-        --panel-bg: rgba(12,12,14,0.92);
-        --panel-border: rgba(255,255,255,0.12);
-        --text: rgba(255,255,255,0.92);
-        --muted: rgba(255,255,255,0.62);
-        --ring: rgba(255,255,255,0.14);
-        --btn-bg: rgba(255,255,255,0.12);
-        --btn-bg-hover: rgba(255,255,255,0.18);
-        --chip: rgba(255,255,255,0.09);
-        --track: rgba(255,255,255,0.10);
-      }
-      html,body{
-        height:100%;
-        margin:0;
-        overflow:hidden;
-        background:var(--bg);
-        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans",
-          "Apple Color Emoji","Segoe UI Emoji";
+      :root {
+        --paper: #f6f0e5;
+        --ink: #131b26;
+        --muted: #5d6777;
+        --line: rgba(19, 27, 38, 0.12);
+        --panel: rgba(255, 255, 255, 0.76);
+        --panel-strong: rgba(255, 255, 255, 0.92);
+        --good: #15876b;
+        --warn: #cc7a12;
+        --bad: #c34f56;
+        --blue: #1467a8;
+        --shadow: 0 24px 60px rgba(19, 27, 38, 0.14);
       }
 
-      #app{
-        width:100vw;
-        height:100vh;
-        position:relative;
-        overflow:hidden;
-        touch-action:none;
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at 18% 18%, rgba(20, 103, 168, 0.14), transparent 26%),
+          radial-gradient(circle at 78% 84%, rgba(251, 191, 36, 0.10), transparent 28%),
+          linear-gradient(180deg, #f8f2e8 0%, #efe7d7 100%);
+        color: var(--ink);
+        font-family: "Avenir Next", "Gill Sans", "Trebuchet MS", sans-serif;
       }
 
-      /* Canvas: crisp and full size */
-      #canvas{
-        display:block;
-        width:100%;
-        height:100%;
-        touch-action:none;
+      body { padding: 18px; }
+      #app-shell {
+        max-width: 1380px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.46);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
       }
-
-      /* Top-left overlay panel */
-      #ui{
-        position:absolute;
-        top:14px;
-        left:14px;
-        right:14px;
-        max-width:540px;
-        padding:14px;
-        border-radius:18px;
-        border:1px solid var(--panel-border);
-        background:var(--panel-bg);
-        color:var(--text);
-        box-shadow:0 10px 30px rgba(0,0,0,0.35);
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 22px 26px 18px;
+        border-bottom: 1px solid var(--line);
       }
-      .title{
-        display:flex;
-        align-items:baseline;
-        justify-content:space-between;
-        gap:12px;
+      .eyebrow {
+        margin: 0 0 8px;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
       }
-      h1{
-        margin:0;
-        font-size:12px;
-        letter-spacing:0.14em;
-        text-transform:uppercase;
-        color:var(--muted);
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1;
+        font-family: "Iowan Old Style", "Baskerville", serif;
       }
-      .meta{
-        font-size:12px;
-        color:var(--muted);
-        white-space:nowrap;
+      .subtitle {
+        margin: 8px 0 0;
+        color: var(--muted);
+        max-width: 760px;
       }
-
-      .grid{
-        display:grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap:10px;
-        margin-top:12px;
+      .top-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-content: start;
+        justify-content: flex-end;
       }
-      .metric{
-        border:1px solid var(--panel-border);
-        border-radius:14px;
-        padding:10px;
-        background:rgba(255,255,255,0.04);
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--panel-strong);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
-      .metric .k{
-        font-size:11px;
-        color:var(--muted);
-        letter-spacing:0.08em;
-        text-transform:uppercase;
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.95fr);
       }
-      .metric .v{
-        margin-top:4px;
-        font-size:18px;
-        font-weight:800;
+      .stage {
+        padding: 22px;
+        border-right: 1px solid var(--line);
       }
-
-      .controls{
-        display:grid;
-        grid-template-columns: 1fr 1fr;
-        gap:10px;
-        margin-top:12px;
+      .panel {
+        padding: 22px;
+        display: grid;
+        gap: 14px;
+        background: rgba(255,255,255,0.18);
       }
-      .card{
-        border:1px solid var(--panel-border);
-        border-radius:14px;
-        padding:10px;
-        background:rgba(255,255,255,0.04);
+      .canvas-card, .card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
       }
-      .row{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:10px;
+      .canvas-card { padding: 14px; }
+      .canvas-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 12px;
+        padding: 2px 6px 12px;
       }
-      .label{
-        font-size:12px;
-        color:var(--muted);
+      .canvas-title {
+        margin: 0;
+        font-size: 1.55rem;
+        font-family: "Iowan Old Style", "Baskerville", serif;
       }
-      .chip{
-        font-size:12px;
-        padding:4px 10px;
-        border-radius:999px;
-        background:var(--chip);
-        border:1px solid var(--panel-border);
-        color:var(--text);
-        font-variant-numeric: tabular-nums;
+      .canvas-note {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
       }
-
-      input[type="range"]{
-        width:100%;
-        margin-top:10px;
-        accent-color: rgba(255,255,255,0.72);
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 840 / 520;
+        border-radius: 22px;
+        background: #f8f5ee;
       }
-      /* make slider track a bit more visible */
-      input[type="range"]::-webkit-slider-runnable-track { background: var(--track); height: 6px; border-radius: 999px; }
-      input[type="range"]::-moz-range-track { background: var(--track); height: 6px; border-radius: 999px; }
-
-      .actions{
-        display:grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap:10px;
-        margin-top:12px;
+      .canvas-footer {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.92rem;
       }
-      button{
-        padding:10px 12px;
-        border-radius:999px;
-        border:1px solid var(--ring);
-        background:var(--btn-bg);
-        color:var(--text);
-        font-weight:800;
-        cursor:pointer;
+      .card { padding: 16px; }
+      .label {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
       }
-      button:hover{ background: var(--btn-bg-hover); }
-      button:active{ transform: translateY(1px); }
-
-      /* Loader */
-      #loader{
-        position:absolute;
-        inset:0;
-        display:grid;
-        place-items:center;
-        pointer-events:none;
-        background:rgba(0,0,0,0.18);
-        color:rgba(255,255,255,0.86);
-        font-size:14px;
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+        border: 1px solid transparent;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
-      .loader-inline{
-        display:inline-flex;
-        align-items:center;
-        gap:10px;
-        padding:10px 14px;
-        border-radius:999px;
-        border:1px solid rgba(255,255,255,0.12);
-        background: rgba(12,12,14,0.72);
+      .status-badge[data-state="open"] { color: var(--good); background: rgba(21,135,107,.12); border-color: rgba(21,135,107,.24); }
+      .status-badge[data-state="bottlenecked"] { color: var(--warn); background: rgba(204,122,18,.12); border-color: rgba(204,122,18,.24); }
+      .status-badge[data-state="blocked"] { color: var(--bad); background: rgba(195,79,86,.12); border-color: rgba(195,79,86,.24); }
+      .status-detail, .mini-text { margin: 0; color: var(--muted); line-height: 1.45; }
+      .challenge-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
       }
-      .spinner{
-        width:18px;height:18px;border-radius:999px;
-        border:2px solid rgba(255,255,255,0.25);
-        border-top-color: rgba(255,255,255,0.75);
-        animation: spin 900ms linear infinite;
+      .stars {
+        font-size: 1.2rem;
+        letter-spacing: 0.12em;
+        color: #dd9b2b;
       }
-      @keyframes spin{ to{ transform: rotate(360deg);} }
-      html[data-wasm-ready="1"] #loader{ display:none; }
-
-      @media (max-width: 560px){
-        #ui{ max-width:none; }
-        .grid{ grid-template-columns: 1fr; }
-        .controls{ grid-template-columns: 1fr; }
-        .actions{ grid-template-columns: 1fr; }
+      .meters {
+        display: grid;
+        gap: 10px;
+      }
+      .meter-head {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.86rem;
+        color: var(--muted);
+      }
+      .track {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(19,27,38,.08);
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 180ms ease;
+      }
+      #score-fill { background: linear-gradient(90deg, #1467a8, #22c55e); width: 0%; }
+      #threshold-fill { background: linear-gradient(90deg, #f59e0b, #ef4444); width: 0%; }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 10px;
+      }
+      .metric {
+        padding: 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(19,27,38,.08);
+        background: rgba(255,255,255,.62);
+      }
+      .metric .k {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .metric .v {
+        margin-top: 6px;
+        font-size: 1.2rem;
+        font-weight: 800;
+      }
+      .candidate[data-state="interesting"] {
+        border-color: rgba(20,103,168,.24);
+        background: linear-gradient(135deg, rgba(20,103,168,.12), rgba(255,255,255,.9));
+      }
+      .knob-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .knob-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+        align-items: center;
+        font-size: 0.92rem;
+        color: var(--muted);
+      }
+      .knob-row input[type="range"] {
+        width: 100%;
+        accent-color: #1467a8;
+      }
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 10px;
+      }
+      .asset-grid {
+        display: grid;
+        gap: 10px;
+      }
+      button {
+        appearance: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 12px;
+        background: var(--panel-strong);
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+      }
+      button:hover { background: #fff; }
+      .footer {
+        padding: 14px 26px 18px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      #loader {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(246,240,229,.92);
+        font-weight: 700;
+      }
+      html[data-wasm-ready="1"] #loader { display: none; }
+      @media (max-width: 1120px) {
+        .layout { grid-template-columns: 1fr; }
+        .stage { border-right: 0; border-bottom: 1px solid var(--line); }
+      }
+      @media (max-width: 720px) {
+        body { padding: 10px; }
+        .topbar, .stage, .panel { padding: 16px; }
+        .buttons, .metrics { grid-template-columns: 1fr; }
       }
     </style>
 
@@ -207,68 +304,153 @@
       window.setWasmReady = function () {
         document.documentElement.dataset.wasmReady = "1";
       };
-      window.addEventListener("wasm:ready", () => window.setWasmReady());
-      // safety fallback
-      setTimeout(() => window.setWasmReady(), 10000);
+      setTimeout(window.setWasmReady, 10000);
     </script>
   </head>
-
   <body>
-    <main id="app">
-      <canvas id="canvas" aria-label="Porosity lab canvas"></canvas>
-
-      <div id="ui" role="group" aria-label="Porosity lab controls">
-        <div class="title">
-          <h1>Porosity Lab</h1>
-          <div class="meta">Rust · WASM · Trunk</div>
+    <div id="loader">Loading foundry…</div>
+    <main id="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Encode AI For Science Demo</p>
+          <h1>PolyMorph Foundry</h1>
+          <p class="subtitle">Breed crystal shapes, place the survivors, and watch porous pathways evolve.</p>
         </div>
-
-        <div class="grid" aria-label="Metrics">
-          <div class="metric">
-            <div class="k">Total void</div>
-            <div class="v" id="stat-total">–</div>
-          </div>
-          <div class="metric">
-            <div class="k">Accessible</div>
-            <div class="v" id="stat-access">–</div>
-          </div>
-          <div class="metric">
-            <div class="k">Isolated</div>
-            <div class="v" id="stat-iso">–</div>
-          </div>
+        <div class="top-chips">
+          <div class="chip">Phase <span id="puzzle-index">1/3</span></div>
+          <div class="chip" id="par-text">Gen 1 · 0/5</div>
         </div>
+      </header>
 
-        <div class="controls" aria-label="Controls">
-          <div class="card">
-            <div class="row">
-              <div class="label">Target porosity</div>
-              <div class="chip"><span id="val-p">0.40</span></div>
+      <section class="layout">
+        <div class="stage">
+          <div class="canvas-card">
+            <div class="canvas-head">
+              <div>
+                <h2 class="canvas-title" id="puzzle-title">Phase 1 · Variation</h2>
+                <p class="canvas-note" id="puzzle-subtitle">Breed open space from diverse crystal seeds.</p>
+              </div>
+              <button class="chip" id="probe-button" type="button">Variation</button>
             </div>
-            <input id="input-p" type="range" min="0.05" max="0.85" step="0.01" value="0.40" />
-          </div>
 
-          <div class="card">
-            <div class="row">
-              <div class="label">Correlation scale</div>
-              <div class="chip"><span id="val-s">20</span> px</div>
+            <canvas id="structure-canvas" aria-label="Interactive pore module puzzle"></canvas>
+
+            <div class="canvas-footer">
+              <div id="selection-text">Bias the foundry toward cavern, throat, or branch.</div>
+              <div>1-3 choose genomes · arrows move · up rotate · space drop · g breed</div>
             </div>
-            <input id="input-s" type="range" min="4" max="64" step="1" value="20" />
           </div>
         </div>
 
-        <div class="actions" aria-label="Actions">
-          <button id="regen" type="button">Regenerate</button>
-          <button id="btn-reset" type="button">Reset</button>
-          <button id="btn-snapshot" type="button">Snapshot</button>
-        </div>
-      </div>
+        <aside class="panel">
+          <section class="card">
+            <p class="label">Challenge</p>
+            <div class="challenge-row">
+              <strong id="objective-text">Reach 22 connected cells.</strong>
+              <div class="stars" id="stars-text">☆☆☆</div>
+            </div>
+          </section>
 
-      <div id="loader" aria-live="polite">
-        <div class="loader-inline">
-          <span class="spinner" aria-hidden="true"></span>
-          <span>Loading lab…</span>
-        </div>
-      </div>
+          <section class="card">
+            <p class="label">Run</p>
+            <div class="status-badge" id="status-badge" data-state="bottlenecked">Breed</div>
+            <p class="status-detail" id="status-detail">Turn the three biases and grow a fresh generation.</p>
+          </section>
+
+          <section class="card">
+            <p class="label">Score</p>
+            <div class="meters">
+              <div>
+                <div class="meter-head"><span>Objective</span><strong><span id="score-total">0</span>/100</strong></div>
+                <div class="track"><div class="fill" id="score-fill"></div></div>
+              </div>
+              <div>
+                <div class="meter-head"><span id="threshold-label">Open void</span><strong>Live</strong></div>
+                <div class="track"><div class="fill" id="threshold-fill"></div></div>
+              </div>
+            </div>
+            <div class="metrics" style="margin-top:12px;">
+              <div class="metric">
+                <div class="k">Guest</div>
+                <div class="v" id="score-bottleneck">None</div>
+              </div>
+              <div class="metric">
+                <div class="k">Traps</div>
+                <div class="v" id="score-cavity">0/0</div>
+              </div>
+              <div class="metric">
+                <div class="k">Turns</div>
+                <div class="v" id="score-cost">0/4</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <p class="label">Selection Pressure</p>
+            <div class="knob-grid">
+              <label class="knob-row">
+                <span>Cavern</span>
+                <input id="knob-volume" type="range" min="0" max="100" value="80" />
+                <strong><span id="knob-volume-value">80</span></strong>
+              </label>
+              <label class="knob-row">
+                <span>Throat</span>
+                <input id="knob-throat" type="range" min="0" max="100" value="40" />
+                <strong><span id="knob-throat-value">40</span></strong>
+              </label>
+              <label class="knob-row">
+                <span>Branch</span>
+                <input id="knob-branch" type="range" min="0" max="100" value="30" />
+                <strong><span id="knob-branch-value">30</span></strong>
+              </label>
+            </div>
+            <div class="buttons" style="margin-top:12px;">
+              <button id="btn-generate" type="button">Breed</button>
+              <button id="btn-reset" type="button">Reset</button>
+              <button id="action-button" type="button" style="display:none;">Next phase</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <p class="label">Generated Genomes</p>
+            <div class="asset-grid">
+              <button id="candidate-1" type="button">Genome 1</button>
+              <button id="candidate-2" type="button">Genome 2</button>
+              <button id="candidate-3" type="button">Genome 3</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <p class="label">Cue</p>
+            <strong id="hint-title">See it</strong>
+            <p class="mini-text" id="hint-text">Only pore space touching the cyan inlet lights up and starts to shimmer.</p>
+          </section>
+
+          <section class="card candidate" id="candidate-card" data-state="routine">
+            <p class="label">Scientific Flag</p>
+            <strong id="candidate-title">Diverse pool</strong>
+            <p class="mini-text" id="candidate-text">You are one strong mutation away from a big volume jump.</p>
+          </section>
+
+          <section class="card">
+            <p class="label">Controls</p>
+            <div class="buttons">
+              <button id="btn-left" type="button">Left</button>
+              <button id="btn-rotate" type="button">Rotate</button>
+              <button id="btn-right" type="button">Right</button>
+              <button id="btn-drop" type="button">Drop</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <p class="label">Concept</p>
+            <strong id="concept-title">Idea</strong>
+            <p class="mini-text" id="concept-text">Evolution starts with variation. Different shapes create different pore volumes.</p>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="footer">Client-side Rust + WASM • projected crystal shapes, evolutionary selection, and porous-material play in one loop</footer>
     </main>
   </body>
 </html>

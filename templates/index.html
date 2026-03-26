@@ -97,6 +97,7 @@
     {% if projects.pages | length > 0 %}
       <div class="home-grid">
         {% for p in projects.pages | slice(end=4) %}
+          {% set page_url = p.permalink | replace(from=config.base_url, to="") %}
 
           {% set cover = "" %}
           {% if p.extra is defined and p.extra.cover is defined and p.extra.cover %}
@@ -109,13 +110,13 @@
               {% set cover_url = cover %}
             {% else %}
               {# Option A: bundle asset next to index.md -> /projects/<slug>/<file> #}
-              {% set cover_url = p.permalink ~ cover %}
+              {% set cover_url = page_url ~ cover %}
             {% endif %}
           {% endif %}
 
           <article class="home-card">
             {% if cover_url and cover_url | length > 0 %}
-              <a class="home-card-media" href="{{ p.permalink }}" aria-label="Open: {{ p.title }}">
+              <a class="home-card-media" href="{{ page_url }}" aria-label="Open: {{ p.title }}">
                 <img
                   src="{{ cover_url }}"
                   alt="{{ p.extra.cover_alt | default(value=p.title) }}"
@@ -128,7 +129,7 @@
             <div class="home-card-body">
               <div class="home-card-top">
                 <h3 class="home-h3">
-                  <a href="{{ p.permalink }}">{{ p.title }}</a>
+                  <a href="{{ page_url }}">{{ p.title }}</a>
                 </h3>
 
                 {% if p.date %}
@@ -152,6 +153,17 @@
                   {% for t in p.taxonomies.tags | slice(end=4) %}
                     <span class="home-tag">{{ t }}</span>
                   {% endfor %}
+                </div>
+              {% endif %}
+
+              {% if p.extra and (p.extra.demo or p.extra.fullscreen) %}
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <a class="btn btn-sm btn-primary rounded-full" href="{{ page_url }}">Project page</a>
+                  {% if p.extra.demo %}
+                    <a class="btn btn-sm btn-outline rounded-full" href="{{ p.extra.demo }}">Open demo</a>
+                  {% elif p.extra.fullscreen %}
+                    <a class="btn btn-sm btn-outline rounded-full" href="{{ p.extra.fullscreen }}">Open demo</a>
+                  {% endif %}
                 </div>
               {% endif %}
             </div>

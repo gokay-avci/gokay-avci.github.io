@@ -12,9 +12,11 @@
         {% continue %}
         {% endif %}
         {% set section = get_section(path=ancestor) %}
-        <li><a class="breadcrumb-path" href="{{ section.permalink }}">{{ section.title }}</a></li>
+        {% set section_url = section.permalink | replace(from=config.base_url, to="") %}
+        <li><a class="breadcrumb-path" href="{{ section_url }}">{{ section.title }}</a></li>
         {% endfor %}
-        <li><a class="breadcrumb-path active" href="{{ current.permalink }}">{{ current.title }}</a></li>
+        {% set current_url = current.permalink | replace(from=config.base_url, to="") %}
+        <li><a class="breadcrumb-path active" href="{{ current_url }}">{{ current.title }}</a></li>
     </ul>
 </div>
 {% endblock breadcrumb %}
