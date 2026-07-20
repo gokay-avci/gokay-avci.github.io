@@ -1,19 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# A simple script to add, commit, and push all changes.
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$repo_root"
 
-# Check if a commit message was provided as the first argument.
-if [ -z "$1" ]; then
-  echo "❌ Error: Please provide a commit message."
-  echo "   Usage: ./publish.sh \"Your update message\""
+if [ "$#" -eq 0 ] || [ -z "$1" ]; then
+  echo "❌ Error: Please provide a commit message." >&2
+  echo "   Usage: ./0_send.sh \"Your update message\"" >&2
   exit 1
 fi
 
 echo ">>> Staging all changes..."
-git add .
+git add --all
+
+if git diff --cached --quiet; then
+  echo "ℹ️  Nothing to commit."
+  exit 0
+fi
 
 echo ">>> Committing changes..."
-git commit -m "$1"
+git commit -m "$*"
 
 echo ">>> Pushing to GitHub..."
 git push

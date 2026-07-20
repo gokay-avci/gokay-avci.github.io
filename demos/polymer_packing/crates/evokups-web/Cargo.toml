@@ -1,0 +1,18 @@
+[package]
+name = "evokups-web"
+description = "Minimal browser interface for evokUPS"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+evokups-core = { path = "../evokups-core" }
+evokups-evaluators = { path = "../evokups-evaluators" }
+evokups-polymer = { path = "../evokups-polymer" }
+
+[lints]
+workspace = true

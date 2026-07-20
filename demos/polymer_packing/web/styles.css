@@ -1,0 +1,66 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #0b1020;
+  color: #e8edff;
+}
+
+body { margin: 0; min-height: 100vh; }
+main { width: min(1240px, calc(100% - 2rem)); margin: 0 auto; padding: 3rem 0; }
+header { margin-bottom: 2rem; }
+.eyebrow { color: #8ea7ff; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.75rem; }
+h1 { font-size: clamp(3rem, 9vw, 6rem); line-height: 0.9; margin: 0.35rem 0 1rem; }
+.controls, .metrics { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.controls, .candidate, .metrics article { background: #141b31; border: 1px solid #283454; border-radius: 14px; padding: 1rem; }
+.execution-note { grid-column: 1 / -1; margin: 0; color: #aebbe5; font-size: 0.85rem; line-height: 1.5; }
+.morphology-control[hidden] { display: none; }
+label { display: grid; gap: 0.45rem; color: #aebbe5; font-size: 0.85rem; }
+input, select, button { border: 1px solid #3b4b76; border-radius: 8px; padding: 0.7rem; background: #0e1528; color: inherit; }
+button { align-self: end; cursor: pointer; background: #496cff; font-weight: 700; }
+button:disabled { cursor: not-allowed; opacity: 0.45; }
+.run-controls { position: sticky; top: 0.75rem; z-index: 20; display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; margin: 1rem 0; padding: 0.7rem; border: 1px solid #3b4b76; border-radius: 12px; background: rgba(14, 21, 40, 0.96); box-shadow: 0 12px 34px rgba(2, 7, 22, 0.38); backdrop-filter: blur(12px); }
+.run-controls button { align-self: center; }
+.run-controls #run-simulation[aria-pressed="true"] { background: #d94b68; border-color: #ff7890; }
+.run-controls span { margin-left: auto; color: #aebbe5; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.metrics { margin: 1rem 0; }
+.metrics article { display: grid; gap: 0.5rem; }
+.metrics span { color: #aebbe5; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.metrics strong { font-size: 1.6rem; }
+.visual-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.75fr); gap: 1rem; }
+.viewer-panel, .fitness-panel { min-width: 0; background: #141b31; border: 1px solid #283454; border-radius: 14px; padding: 1rem; }
+.viewer-panel { box-shadow: 0 18px 60px rgba(2, 7, 22, 0.32); }
+.panel-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.panel-heading h2 { margin: 0; }
+.panel-heading span, #genetic-event { color: #9dadcf; font-size: 0.85rem; }
+.viewer-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.65rem; flex-wrap: wrap; }
+.viewer-actions button { padding: 0.35rem 0.55rem; background: transparent; font-size: 0.78rem; }
+canvas { display: block; width: 100%; height: 520px; margin-top: 0.75rem; border: 1px solid rgba(118, 167, 255, 0.12); border-radius: 10px; background: radial-gradient(circle at 50% 42%, #182342 0%, #0e1528 64%); touch-action: none; }
+#fitness-view { height: 280px; }
+#genetic-event { min-height: 1.3rem; margin-bottom: 0; }
+.chain-legend { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.8rem; color: #aebbe5; font-size: 0.78rem; }
+.chain-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.chain-legend i { width: 0.65rem; height: 0.65rem; border-radius: 50%; display: inline-block; }
+.legend-stack { padding: 0.2rem 0 0.65rem; border-bottom: 1px solid rgba(157, 173, 207, 0.12); }
+.type-legend { margin-top: 0.45rem; }
+.type-legend span { padding: 0.25rem 0.45rem; border: 1px solid rgba(157, 173, 207, 0.15); border-radius: 999px; background: rgba(14, 21, 40, 0.7); }
+#selected-bead { margin: 0.65rem 0 0; min-height: 1.3rem; color: #dce5ff; font-size: 0.85rem; }
+.viewer-toggles { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-top: 0.7rem; }
+.viewer-toggles label { display: flex; align-items: center; gap: 0.35rem; }
+.fitness-breakdown { display: grid; gap: 0.42rem; margin-top: 0.8rem; }
+.fitness-breakdown div { display: grid; grid-template-columns: 6.7rem minmax(3rem, 1fr) 4.5rem; align-items: center; gap: 0.5rem; color: #aebbe5; font-size: 0.78rem; }
+.fitness-breakdown i { display: block; height: 0.38rem; overflow: hidden; border-radius: 999px; background: rgba(157, 173, 207, 0.12); }
+.fitness-breakdown b { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #496cff, #79dfb6); }
+.fitness-breakdown strong { text-align: right; color: #e8edff; font-variant-numeric: tabular-nums; }
+#void-diagnostics { color: #9dadcf; font-size: 0.78rem; }
+details summary { cursor: pointer; font-weight: 700; }
+pre { overflow-x: auto; color: #bcd0ff; line-height: 1.65; }
+#status { color: #9dadcf; }
+
+@media (max-width: 760px) {
+  .visual-grid { grid-template-columns: 1fr; }
+  canvas { height: 420px; }
+  #fitness-view { height: 260px; }
+  .panel-heading { align-items: flex-start; }
+  .viewer-actions { justify-content: flex-start; }
+  .run-controls span { width: 100%; margin-left: 0; }
+}

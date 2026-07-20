@@ -68,17 +68,7 @@ jobs:
         # This ENTIRE build step is now conditional. It will be SKIPPED
         # if the cache was successfully restored, saving significant time.
         if: steps.cache-demos-restore.outputs.cache-hit != 'true'
-        run: |
-          echo "WASM cache not found or invalid. Rebuilding demos..."
-          for D_PATH in demos/*; do
-            if [ -d "$D_PATH" ]; then
-              (
-                echo "--- Building WASM Demo in $D_PATH ---"
-                cd "$D_PATH"
-                trunk build --release
-              )
-            fi
-          done
+        run: ./scripts/build_demos.sh release
 
       # ------------------------------------------------------------------
       # STAGE 2: BUILD THE ZOLA WEBSITE

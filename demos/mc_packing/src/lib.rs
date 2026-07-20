@@ -128,7 +128,6 @@ impl ShapeDef {
         }
     }
 
-    fn is_disk(&self) -> bool { self.kind == ShapeKind::Disk }
     fn is_rotatable(&self) -> bool { self.kind != ShapeKind::Disk }
 
     fn world_poly(&self, center: Pt, theta: f64, r_eff: f64) -> Option<Vec<Pt>> {
@@ -824,11 +823,11 @@ impl Sim {
         max_pen
     }
 
-    fn metropolis_accept(&mut self, dE: f64, jacobian_term: f64) -> bool {
-        if dE <= 0.0 {
+    fn metropolis_accept(&mut self, delta_energy: f64, jacobian_term: f64) -> bool {
+        if delta_energy <= 0.0 {
             return true;
         }
-        let logp = -self.cfg.beta * dE + jacobian_term;
+        let logp = -self.cfg.beta * delta_energy + jacobian_term;
         let u: f64 = self.rng.gen();
         u.ln() < logp
     }
@@ -850,16 +849,16 @@ impl Sim {
         self.confine(&mut cand);
 
         let (k, pexp) = self.hardness_params();
-        let mut dE = 0.0;
+        let mut delta_energy = 0.0;
 
         for (j, b) in self.parts.iter().enumerate() {
             if j == i { continue; }
             let old_depth = self.pair_penetration(&old, b);
             let new_depth = self.pair_penetration(&cand, b);
-            dE += k * (new_depth.powf(pexp) - old_depth.powf(pexp));
+            delta_energy += k * (new_depth.powf(pexp) - old_depth.powf(pexp));
         }
 
-        if self.metropolis_accept(dE, 0.0) {
+        if self.metropolis_accept(delta_energy, 0.0) {
             self.parts[i] = cand;
             self.acc_t += 1;
         }
@@ -887,16 +886,16 @@ impl Sim {
         cand.theta = wrap_angle(cand.theta + dtheta);
 
         let (k, pexp) = self.hardness_params();
-        let mut dE = 0.0;
+        let mut delta_energy = 0.0;
 
         for (j, b) in self.parts.iter().enumerate() {
             if j == i { continue; }
             let old_depth = self.pair_penetration(&old, b);
             let new_depth = self.pair_penetration(&cand, b);
-            dE += k * (new_depth.powf(pexp) - old_depth.powf(pexp));
+            delta_energy += k * (new_depth.powf(pexp) - old_depth.powf(pexp));
         }
 
-        if self.metropolis_accept(dE, 0.0) {
+        if self.metropolis_accept(delta_energy, 0.0) {
             self.parts[i] = cand;
             self.acc_r += 1;
         }
@@ -929,16 +928,16 @@ impl Sim {
         let old_parts = std::mem::replace(&mut self.parts, new_parts);
         let (new_u, _, _) = self.energy_and_overlap_stats();
 
-        let dE = new_u - old_u;
+        let delta_energy = new_u - old_u;
 
         let old_a = old_lx * old_ly;
         let new_a = new_lx * new_ly;
         let p = self.cfg.pressure;
 
-        let dH = dE + p * (new_a - old_a);
+        let delta_enthalpy = delta_energy + p * (new_a - old_a);
         let jac = (self.parts.len() as f64) * (new_a / old_a).ln();
 
-        let ok = self.metropolis_accept(dH, jac);
+        let ok = self.metropolis_accept(delta_enthalpy, jac);
 
         if ok {
             self.acc_v += 1;

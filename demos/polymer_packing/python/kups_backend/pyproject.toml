@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evokups-kups-backend"
+version = "0.0.0"
+description = "Placeholder adapter for a future kUPS/JAX population evaluator"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+service = [
+    "fastapi>=0.115",
+    "jax>=0.5",
+    "uvicorn>=0.34",
+]
+
+[project.scripts]
+evokups-backend = "kups_backend.service:main"
+evokups-backend-stdlib = "kups_backend.stdlib_service:main"

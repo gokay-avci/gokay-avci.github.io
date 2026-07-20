@@ -12,8 +12,8 @@
     <!-- Trunk entry -->
     
 <script type="module">
-import init, * as bindings from '/demos/grains/grains-b2ab1aa001963804.js';
-const wasm = await init({ module_or_path: '/demos/grains/grains-b2ab1aa001963804_bg.wasm' });
+import init, * as bindings from '/demos/grains/grains-3785a1b2a463a6d5.js';
+const wasm = await init({ module_or_path: '/demos/grains/grains-3785a1b2a463a6d5_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -149,7 +149,7 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       // (Keeps UX sane without masking real problems too quickly.)
       setTimeout(() => window.setWasmReady(), 8000);
     </script>
-  <link rel="modulepreload" href="/demos/grains/grains-b2ab1aa001963804.js" crossorigin="anonymous" integrity="sha384-B7p+2a9CZ3QUdX5+9WEfkASiBIN1DOrf6hX11Mqc7XzWLRansvMNROst11IOhrfs"><link rel="preload" href="/demos/grains/grains-b2ab1aa001963804_bg.wasm" crossorigin="anonymous" integrity="sha384-MOMy9fZQATWNCwMN6VYk/V/cy2GjShoheioITbB1eZRAu/do+rX779UJ7knSyu+0" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/demos/grains/grains-3785a1b2a463a6d5.js" crossorigin="anonymous" integrity="sha384-aMarKKtIBPwPB2y26F/0pQKYkF77QFe5B/e+yp5Nifovo53fARWAxO2GwudcxzQl"><link rel="preload" href="/demos/grains/grains-3785a1b2a463a6d5_bg.wasm" crossorigin="anonymous" integrity="sha384-kVi4aMg81ictlfgTAIEQ+YgdlGK+D2sGYgaS+3GIDkrnGNsi5QROSZ+mMNL0985l" as="fetch" type="application/wasm"></head>
 
   <body>
     <canvas id="canvas" aria-label="Grain growth simulation canvas"></canvas>

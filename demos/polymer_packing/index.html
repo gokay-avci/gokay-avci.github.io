@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>evokUPS — evolutionary atomistic search</title>
+    <link rel="stylesheet" href="web/styles.css?v=20260720d" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Rust · WebAssembly · Atomistic Search</p>
+        <h1>evokUPS</h1>
+        <p>Batched evolutionary pre-packing of polydisperse polymer chains with differentiable forces.</p>
+      </header>
+      <section class="controls" aria-label="Search controls">
+        <label>Scientific problem
+          <select id="problem">
+            <option value="1">Polydisperse polymer pre-packing</option>
+            <option value="0">Lennard-Jones cluster baseline</option>
+          </select>
+        </label>
+        <label>Seed <input id="seed" type="number" value="42" min="0" /></label>
+        <label>Population <input id="population" type="number" value="32" min="2" max="256" /></label>
+        <label>Beads / atoms <input id="atoms" type="number" value="64" min="2" max="50000" /></label>
+        <label>Polymer chains <input id="chains" type="number" value="6" min="1" max="1000" /></label>
+        <label>Dispersity strength
+          <span><output id="dispersity-value">0.65</output></span>
+          <input id="dispersity" type="range" value="0.65" min="0" max="1.5" step="0.05" />
+        </label>
+        <label>Preferred architecture
+          <select id="architecture">
+            <option value="0">Linear chains</option>
+            <option value="1">Circular / ring chains</option>
+            <option value="2">Dendritic trees</option>
+            <option value="3">Bottlebrush / exotic</option>
+          </select>
+        </label>
+        <label>Contour persistence, cos Δθ
+          <span><output id="persistence-value">0.30</output></span>
+          <input id="persistence" type="range" value="0.30" min="-0.20" max="0.90" step="0.05" />
+        </label>
+        <label class="morphology-control" data-architectures="1">Ring puckering amplitude, A/σ
+          <span><output id="ring-puckering-value">0.20</output></span>
+          <input id="ring-puckering" type="range" value="0.20" min="0" max="0.80" step="0.05" />
+        </label>
+        <label class="morphology-control" data-architectures="2">Dendrimer outward branches
+          <select id="dendritic-branching">
+            <option value="2" selected>2 · trifunctional internal junction</option>
+            <option value="3">3 · tetrafunctional internal junction</option>
+          </select>
+        </label>
+        <label class="morphology-control" data-architectures="2">Dendrimer spacer beads
+          <span><output id="dendritic-spacer-value">2</output></span>
+          <input id="dendritic-spacer" type="range" value="2" min="1" max="8" step="1" />
+        </label>
+        <label class="morphology-control" data-architectures="3">Bottlebrush graft spacing, N<sub>g</sub>
+          <span><output id="graft-spacing-value">2</output></span>
+          <input id="graft-spacing" type="range" value="2" min="1" max="16" step="1" />
+        </label>
+        <label class="morphology-control" data-architectures="3">Bottlebrush side-chain beads, N<sub>sc</sub>
+          <span><output id="side-chain-length-value">3</output></span>
+          <input id="side-chain-length" type="range" value="3" min="1" max="32" step="1" />
+        </label>
+        <label>Reconnection attempt probability
+          <span><output id="reconnection-value">0.15</output></span>
+          <input id="reconnection" type="range" value="0.15" min="0" max="0.8" step="0.01" />
+        </label>
+        <label>Reconnection acceptance scale, Θ<sub>bridge</sub>/ε
+          <span><output id="mc-temperature-value">0.35</output></span>
+          <input id="mc-temperature" type="range" value="0.35" min="0.02" max="2" step="0.02" />
+        </label>
+        <label>Initial reduced density, ρ<sub>0</sub>* = Nσ³/V
+          <span><output id="density-value">0.30</output></span>
+          <input id="density" type="range" value="0.30" min="0.05" max="0.90" step="0.01" />
+        </label>
+        <label>System reduced temperature, T* = k<sub>B</sub>T/ε
+          <span><output id="system-temperature-value">0.35</output></span>
+          <input id="system-temperature" type="range" value="0.35" min="0" max="2" step="0.02" />
+        </label>
+        <label>Target reduced pressure, P<sub>target</sub>* = Pσ³/ε
+          <input id="target-pressure" type="number" value="0" min="-2" max="5" step="0.05" />
+        </label>
+        <label>Shared-cell pressure response, κ<sub>g</sub>
+          <span><output id="cell-response-value">0.03</output></span>
+          <input id="cell-response" type="range" value="0.03" min="0" max="0.12" step="0.005" />
+        </label>
+        <label>Generations per visual update
+          <select id="render-stride">
+            <option value="1">1 · maximum visual detail</option>
+            <option value="5" selected>5 · balanced</option>
+            <option value="10">10 · faster search</option>
+            <option value="25">25 · compute priority</option>
+          </select>
+        </label>
+        <label>Evolution mode
+          <select id="mode">
+            <option value="0">Single-point genetic</option>
+            <option value="1">Lamarckian relaxation</option>
+            <option value="2">Baldwinian learning</option>
+          </select>
+        </label>
+        <label>Evaluator
+          <select id="evaluator-source">
+            <option value="local">Built-in Rust/WASM evaluator</option>
+            <option value="remote">External kUPS/JAX service (must be running)</option>
+          </select>
+        </label>
+        <label class="backend-control">Backend URL
+          <input id="backend-url" type="url" value="http://127.0.0.1:8766" spellcheck="false" />
+        </label>
+        <p class="execution-note"><strong>Reduced units:</strong> bead diameter σ, energy ε, density ρ* = Nσ³/V, pressure P* = Pσ³/ε, temperature T* = k<sub>B</sub>T/ε. Θ<sub>bridge</sub>/ε is an algorithmic acceptance scale, not a physical temperature. The local pressure controller changes one shared isotropic cell between generations, preserving the fixed [population, beads, 3] batch. Set κ<sub>g</sub> to zero for a fixed-volume search. <strong>External kUPS</strong> keeps JAX hot, so its cell is fixed for the session.</p>
+      </section>
+      <nav class="run-controls" aria-label="Simulation controls">
+        <button id="initialize">Initialize</button>
+        <button id="advance" disabled>Advance one generation</button>
+        <button id="run-simulation" disabled aria-pressed="false">Start simulation</button>
+        <span id="run-state">Not initialized</span>
+      </nav>
+      <section class="metrics" aria-live="polite">
+        <article><span>Problem</span><strong id="active-problem">—</strong></article>
+        <article><span>Mode</span><strong id="active-mode">—</strong></article>
+        <article><span>Population batch</span><strong id="batch-shape">—</strong></article>
+        <article><span>Evaluator</span><strong id="active-evaluator">—</strong></article>
+        <article><span>Generation</span><strong id="generation">—</strong></article>
+        <article><span>Best total fitness, ε</span><strong id="energy">—</strong></article>
+        <article><span>Reduced pressure, P*</span><strong id="pressure">—</strong></article>
+        <article><span>Density / cell</span><strong id="density-cell">—</strong></article>
+        <article><span>Last population batch</span><strong id="batch-time">—</strong></article>
+      </section>
+      <section class="visual-grid">
+        <article class="viewer-panel">
+          <div class="panel-heading">
+            <h2>Best packing</h2>
+            <div class="viewer-actions">
+              <span>Orbit · zoom · pan · select particles</span>
+              <button id="reset-view" type="button">Reset view</button>
+            </div>
+          </div>
+          <div class="viewer-toggles" aria-label="Structure display controls">
+            <label><input id="show-bonds" type="checkbox" checked /> bonds</label>
+            <label><input id="show-cell" type="checkbox" checked /> periodic cell</label>
+            <label><input id="show-void" type="checkbox" /> residual void field</label>
+          </div>
+          <canvas id="structure-view" aria-label="Rotatable projection of the best polymer packing"></canvas>
+          <div class="legend-stack">
+            <div id="chain-legend" class="chain-legend" aria-label="Polymer chain legend"></div>
+            <div id="type-legend" class="chain-legend type-legend" aria-label="Coarse-grained bead type legend"></div>
+          </div>
+          <p id="selected-bead">Select a bead to inspect its coarse-grained identity.</p>
+          <p id="bond-diagnostics">Minimum-image bond diagnostics appear after initialization.</p>
+          <p id="genetic-event">Initialize a population to inspect its winning lineage.</p>
+        </article>
+        <article class="fitness-panel">
+          <div class="panel-heading">
+            <h2>Fitness evolution</h2>
+            <span>Lower is better</span>
+          </div>
+          <canvas id="fitness-view" aria-label="Best packing energy by generation"></canvas>
+          <div id="fitness-breakdown" class="fitness-breakdown">Initialize a polymer population to inspect its objective.</div>
+          <p id="void-diagnostics"></p>
+        </article>
+      </section>
+      <section class="candidate">
+        <details>
+          <summary>Best candidate coordinates</summary>
+          <pre id="coordinates">Build the WASM module, then initialize a population.</pre>
+        </details>
+      </section>
+      <p id="status" role="status">Loading WebAssembly…</p>
+    </main>
+    <script type="module" src="web/app.js?v=20260720d"></script>
+  </body>
+</html>
